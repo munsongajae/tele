@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telegram Channel Reader</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div>
+        <h1>Telegram Channel Reader</h1>
+        <p id="statusText">Checking session...</p>
+      </div>
+      <button id="refreshStatus" class="iconButton" title="상태 새로고침">↻</button>
+    </section>
+
+    <section class="panel" id="authPanel">
+      <div class="panelHeader">
+        <h2>API Session</h2>
+        <p id="authHint">Enter credentials once, or save them in .env.</p>
+      </div>
+      <div class="grid authGrid">
+        <label>
+          <span>App api_id</span>
+          <input id="apiId" inputmode="numeric" autocomplete="off" placeholder="123456">
+        </label>
+        <label>
+          <span>App api_hash</span>
+          <input id="apiHash" autocomplete="off" placeholder="32-character hash">
+        </label>
+        <label>
+          <span>Phone</span>
+          <input id="phone" autocomplete="tel" placeholder="+821012345678">
+        </label>
+        <button id="connectBtn">Connect</button>
+      </div>
+      <div class="grid codeGrid" id="codeBox" hidden>
+        <label>
+          <span>Login code</span>
+          <input id="code" autocomplete="one-time-code" placeholder="Telegram code">
+        </label>
+        <label>
+          <span>2FA password</span>
+          <input id="password" type="password" autocomplete="current-password" placeholder="If enabled">
+        </label>
+        <button id="verifyBtn">Verify</button>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <div class="row">
+        <label class="channelSelectField">
+          <span>Saved channels</span>
+          <select id="channelSelect"></select>
+        </label>
+        <label class="channelField">
+          <span>Channel</span>
+          <input id="channel" value="TasnimNews" autocomplete="off">
+        </label>
+        <label class="limitField">
+          <span>Limit</span>
+          <input id="limit" type="number" min="1" max="1000" value="30">
+        </label>
+      </div>
+      <div class="row">
+        <label class="searchField">
+          <span>Search terms</span>
+          <textarea id="search" autocomplete="off" placeholder="비워두면 최신 포스팅 목록&#10;여러 키워드는 줄바꿈 또는 쉼표로 입력"></textarea>
+        </label>
+        <button id="loadBtn">Load Posts</button>
+      </div>
+      <div class="row dateRow">
+        <label>
+          <span>Date from</span>
+          <input id="dateFrom" type="datetime-local">
+        </label>
+        <label>
+          <span>Date to</span>
+          <input id="dateTo" type="datetime-local">
+        </label>
+      </div>
+      <div class="optionRow">
+        <label class="checkLabel">
+          <input id="koreanSearch" type="checkbox">
+          <span>Korean keyword search</span>
+        </label>
+        <label class="selectLabel">
+          <span>Content</span>
+          <select id="contentFilter">
+            <option value="all" selected>All posts</option>
+            <option value="with_media">Posts with media</option>
+            <option value="with_photo">Posts with photo</option>
+            <option value="with_video">Posts with video</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="listHeader">
+      <div>
+        <h2 id="resultTitle">Posts</h2>
+        <p id="resultMeta">No data loaded.</p>
+      </div>
+      <div class="listActions">
+        <button id="translateBtn" disabled>Translate Loaded</button>
+        <button id="downloadBtn" disabled>Save to Folder</button>
+        <button id="loadMoreBtn" disabled>Load More</button>
+      </div>
+    </section>
+
+    <section id="posts" class="posts"></section>
+  </main>
+  <script src="/app.js?v=20260602-channel-labels"></script>
+</body>
+</html>
