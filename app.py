@@ -15,7 +15,6 @@ from telethon.errors import ApiIdInvalidError, SessionPasswordNeededError
 
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
-DOWNLOADS = ROOT / "downloads"
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("TELE_UI_PORT", "8788"))
 LOCAL_TZ = timezone(timedelta(hours=9))
@@ -36,6 +35,8 @@ def load_dotenv(path):
 
 
 load_dotenv(ROOT / ".env")
+PORT = int(os.environ.get("TELE_UI_PORT", str(PORT)))
+DOWNLOAD_DIR = Path(os.environ.get("TELE_DOWNLOAD_DIR", str(ROOT / "downloads"))).expanduser()
 
 
 def normalize_api_id(value):
@@ -160,6 +161,29 @@ def configured_channels():
         if channel:
             channels.append({"id": channel, "label": label or channel})
     return channels or [{"id": "TasnimNews", "label": "TasnimNews"}]
+
+
+def resolve_download_dir(value):
+    raw = str(value or "").strip().strip("'\"")
+    if not raw:
+        raise ValueError("Download directory is empty.")
+    path = Path(raw).expanduser()
+    if not path.is_absolute():
+        path = ROOT / path
+    return path.resolve()
+
+
+def get_download_dir():
+    global DOWNLOAD_DIR
+    DOWNLOAD_DIR = resolve_download_dir(DOWNLOAD_DIR)
+    return DOWNLOAD_DIR
+
+
+def set_download_dir(value):
+    global DOWNLOAD_DIR
+    DOWNLOAD_DIR = resolve_download_dir(value)
+    DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    return {"download_dir": str(DOWNLOAD_DIR)}
 
 
 class TelegramService:
@@ -389,13 +413,14 @@ def export_items(payload):
     date_from = str(payload.get("date_from") or "").strip()
     date_to = str(payload.get("date_to") or "").strip()
     items = payload.get("items") or []
-    DOWNLOADS.mkdir(exist_ok=True)
+    download_dir = get_download_dir()
+    download_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     date_part = ""
     if date_from or date_to:
         date_part = f"_{file_safe(date_from or 'start')}_to_{file_safe(date_to or 'end')}"
     suffix = f"_{file_safe(search)}" if search else ""
-    path = DOWNLOADS / f"{file_safe(channel)}{date_part}{suffix}_{stamp}_ai_posts.md"
+    path = download_dir / f"{file_safe(channel)}{date_part}{suffix}_{stamp}_ai_posts.md"
     path.write_text(build_ai_markdown(channel, search, items, date_from, date_to), encoding="utf-8")
     return {"path": str(path), "count": len(items)}
 
@@ -408,6 +433,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(SERVICE.call(SERVICE.status()))
             if parsed.path == "/api/channels":
                 return self.json_response({"channels": configured_channels()})
+            if parsed.path == "/api/settings":
+                return self.json_response({"download_dir": str(get_download_dir())})
             if parsed.path == "/api/posts":
                 query = parse_qs(parsed.query)
                 data = SERVICE.call(
@@ -442,6 +469,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(translate_items(payload.get("items") or []))
             if self.path == "/api/export":
                 return self.json_response(export_items(payload))
+            if self.path == "/api/settings":
+                return self.json_response(set_download_dir(payload.get("download_dir")))
             return self.json_response({"error": "not found"}, 404)
         except ApiIdInvalidError:
             return self.json_response(

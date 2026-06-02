@@ -49,6 +49,20 @@
       </div>
     </section>
 
+    <section class="panel settingsPanel">
+      <div class="panelHeader">
+        <h2>Export Settings</h2>
+        <p id="downloadHint">Loading download folder...</p>
+      </div>
+      <div class="settingsRow">
+        <label>
+          <span>Download folder</span>
+          <input id="downloadDir" autocomplete="off" placeholder="C:\tele\downloads">
+        </label>
+        <button id="saveDownloadDirBtn">Save Folder</button>
+      </div>
+    </section>
+
     <section class="panel controls">
       <div class="row">
         <label class="channelSelectField">
@@ -112,6 +126,6 @@
 
     <section id="posts" class="posts"></section>
   </main>
-  <script src="/app.js?v=20260602-channel-labels"></script>
+  <script src="/app.js?v=20260602-download-dir"></script>
 </body>
 </html>

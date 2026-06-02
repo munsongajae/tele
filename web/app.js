@@ -9,6 +9,9 @@ const translateBtn = document.querySelector("#translateBtn");
 const downloadBtn = document.querySelector("#downloadBtn");
 const authHint = document.querySelector("#authHint");
 const channelSelect = document.querySelector("#channelSelect");
+const downloadDir = document.querySelector("#downloadDir");
+const downloadHint = document.querySelector("#downloadHint");
+const saveDownloadDirBtn = document.querySelector("#saveDownloadDirBtn");
 
 let nextOffset = null;
 let currentChannel = "TasnimNews";
@@ -144,6 +147,34 @@ async function loadChannels() {
     }
   } catch (error) {
     channelSelect.innerHTML = `<option value="">Custom channel</option>`;
+  }
+}
+
+async function loadSettings() {
+  try {
+    const data = await request("/api/settings");
+    downloadDir.value = data.download_dir || "";
+    downloadHint.textContent = data.download_dir ? `Saving exports to ${data.download_dir}` : "Download folder is not set.";
+  } catch (error) {
+    downloadHint.textContent = error.message;
+  }
+}
+
+async function saveDownloadDir() {
+  saveDownloadDirBtn.disabled = true;
+  saveDownloadDirBtn.textContent = "Saving...";
+  try {
+    const data = await request("/api/settings", {
+      method: "POST",
+      body: JSON.stringify({ download_dir: downloadDir.value }),
+    });
+    downloadDir.value = data.download_dir;
+    downloadHint.textContent = `Saving exports to ${data.download_dir}`;
+  } catch (error) {
+    downloadHint.textContent = error.message;
+  } finally {
+    saveDownloadDirBtn.textContent = "Save Folder";
+    saveDownloadDirBtn.disabled = false;
   }
 }
 
@@ -298,6 +329,8 @@ downloadBtn.addEventListener("click", () => downloadForAi());
 channelSelect.addEventListener("change", () => {
   if (channelSelect.value) document.querySelector("#channel").value = channelSelect.value;
 });
+saveDownloadDirBtn.addEventListener("click", () => saveDownloadDir());
 
 refreshStatus();
 loadChannels();
+loadSettings();
