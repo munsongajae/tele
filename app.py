@@ -267,6 +267,27 @@ def set_download_dir(value):
     return {"download_dir": str(path)}
 
 
+def pick_download_dir():
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+    except ImportError as exc:
+        raise RuntimeError("Folder picker is not available in this Python environment.") from exc
+
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    selected = filedialog.askdirectory(
+        initialdir=str(get_download_dir()),
+        title="Select export folder",
+        mustexist=False,
+    )
+    root.destroy()
+    if not selected:
+        return {"download_dir": str(get_download_dir()), "cancelled": True}
+    return set_download_dir(selected)
+
+
 class TelegramService:
     def __init__(self):
         self.loop = asyncio.new_event_loop()
@@ -553,6 +574,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(export_items(payload))
             if self.path == "/api/settings":
                 return self.json_response(set_download_dir(payload.get("download_dir")))
+            if self.path == "/api/pick-folder":
+                return self.json_response(pick_download_dir())
             if self.path == "/api/channels":
                 return self.json_response(set_channels(payload.get("channels") or []))
             return self.json_response({"error": "not found"}, 404)

@@ -15,6 +15,7 @@ const saveDownloadDirBtn = document.querySelector("#saveDownloadDirBtn");
 const dbHint = document.querySelector("#dbHint");
 const channelList = document.querySelector("#channelList");
 const saveChannelsBtn = document.querySelector("#saveChannelsBtn");
+const browseDownloadDirBtn = document.querySelector("#browseDownloadDirBtn");
 
 let nextOffset = null;
 let currentChannel = "TasnimNews";
@@ -217,6 +218,26 @@ async function saveDownloadDir() {
   }
 }
 
+async function browseDownloadDir() {
+  browseDownloadDirBtn.disabled = true;
+  browseDownloadDirBtn.textContent = "Opening...";
+  try {
+    const data = await request("/api/pick-folder", {
+      method: "POST",
+      body: JSON.stringify({}),
+    });
+    downloadDir.value = data.download_dir;
+    downloadHint.textContent = data.cancelled
+      ? `Folder selection cancelled. Current folder: ${data.download_dir}`
+      : `Saving exports to ${data.download_dir}`;
+  } catch (error) {
+    downloadHint.textContent = error.message;
+  } finally {
+    browseDownloadDirBtn.textContent = "Browse";
+    browseDownloadDirBtn.disabled = false;
+  }
+}
+
 async function connect() {
   const payload = {
     api_id: document.querySelector("#apiId").value,
@@ -370,6 +391,7 @@ channelSelect.addEventListener("change", () => {
 });
 saveDownloadDirBtn.addEventListener("click", () => saveDownloadDir());
 saveChannelsBtn.addEventListener("click", () => saveChannels());
+browseDownloadDirBtn.addEventListener("click", () => browseDownloadDir());
 
 refreshStatus();
 loadChannels();

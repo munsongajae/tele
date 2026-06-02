@@ -165,7 +165,7 @@ p {
 
 .settingsRow {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 130px;
+  grid-template-columns: minmax(240px, 1fr) 100px 130px;
   gap: 12px;
   align-items: end;
 }
