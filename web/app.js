@@ -13,9 +13,10 @@ const downloadDir = document.querySelector("#downloadDir");
 const downloadHint = document.querySelector("#downloadHint");
 const saveDownloadDirBtn = document.querySelector("#saveDownloadDirBtn");
 const dbHint = document.querySelector("#dbHint");
-const channelList = document.querySelector("#channelList");
+const channelRows = document.querySelector("#channelRows");
 const saveChannelsBtn = document.querySelector("#saveChannelsBtn");
 const browseDownloadDirBtn = document.querySelector("#browseDownloadDirBtn");
+const addChannelBtn = document.querySelector("#addChannelBtn");
 
 let nextOffset = null;
 let currentChannel = "TasnimNews";
@@ -98,6 +99,31 @@ function postCard(item) {
   `;
 }
 
+function channelRow(item = { id: "", label: "" }) {
+  const row = document.createElement("div");
+  row.className = "channelRow";
+  row.innerHTML = `
+    <label>
+      <span>Channel ID</span>
+      <input class="channelIdInput" autocomplete="off" placeholder="TasnimNews" value="${escapeHtml(item.id || "")}">
+    </label>
+    <label>
+      <span>Korean name</span>
+      <input class="channelLabelInput" autocomplete="off" placeholder="타스님뉴스" value="${escapeHtml(item.label || "")}">
+    </label>
+    <button class="removeChannelBtn" type="button">Remove</button>
+  `;
+  row.querySelector(".removeChannelBtn").addEventListener("click", () => row.remove());
+  return row;
+}
+
+function renderChannelRows(channels) {
+  channelRows.innerHTML = "";
+  (channels.length ? channels : [{ id: "", label: "" }]).forEach((item) => {
+    channelRows.appendChild(channelRow(item));
+  });
+}
+
 function renderPosts() {
   posts.innerHTML = loadedItems.length
     ? loadedItems.map(postCard).join("")
@@ -140,7 +166,7 @@ async function loadChannels() {
       return { id: item.id, label: item.label || item.id };
     }).filter((item) => item.id);
     savedChannels = normalized;
-    channelList.value = normalized.map((item) => `${item.id}|${item.label}`).join("\n");
+    renderChannelRows(normalized);
     channelSelect.innerHTML = [
       `<option value="">Custom channel</option>`,
       ...normalized.map((channel) => {
@@ -157,15 +183,11 @@ async function loadChannels() {
   }
 }
 
-function parseChannelList(value) {
-  return String(value || "")
-    .split(/\n+/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [id, ...labelParts] = line.split("|");
-      const channel = id.trim().replace(/^@+/, "");
-      const label = labelParts.join("|").trim() || channel;
+function readChannelRows() {
+  return Array.from(channelRows.querySelectorAll(".channelRow"))
+    .map((row) => {
+      const channel = row.querySelector(".channelIdInput").value.trim().replace(/^@+/, "");
+      const label = row.querySelector(".channelLabelInput").value.trim() || channel;
       return { id: channel, label };
     })
     .filter((item) => item.id);
@@ -177,7 +199,7 @@ async function saveChannels() {
   try {
     await request("/api/channels", {
       method: "POST",
-      body: JSON.stringify({ channels: parseChannelList(channelList.value) }),
+      body: JSON.stringify({ channels: readChannelRows() }),
     });
     await loadChannels();
     downloadHint.textContent = "Channel list saved to local DB.";
@@ -392,6 +414,7 @@ channelSelect.addEventListener("change", () => {
 saveDownloadDirBtn.addEventListener("click", () => saveDownloadDir());
 saveChannelsBtn.addEventListener("click", () => saveChannels());
 browseDownloadDirBtn.addEventListener("click", () => browseDownloadDir());
+addChannelBtn.addEventListener("click", () => channelRows.appendChild(channelRow()));
 
 refreshStatus();
 loadChannels();

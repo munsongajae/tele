@@ -63,11 +63,12 @@
         <button id="browseDownloadDirBtn">Browse</button>
         <button id="saveDownloadDirBtn">Save Folder</button>
       </div>
-      <div class="settingsRow channelSettingsRow">
-        <label>
+      <div class="channelSettingsRow">
+        <div class="channelSettingsHeader">
           <span>Saved channel list</span>
-          <textarea id="channelList" autocomplete="off" placeholder="TasnimNews|타스님뉴스&#10;farsna|파르스뉴스"></textarea>
-        </label>
+          <button id="addChannelBtn">Add Channel</button>
+        </div>
+        <div id="channelRows" class="channelRows"></div>
         <button id="saveChannelsBtn">Save Channels</button>
       </div>
     </section>
@@ -135,6 +136,6 @@
 
     <section id="posts" class="posts"></section>
   </main>
-  <script src="/app.js?v=20260602-folder-picker"></script>
+  <script src="/app.js?v=20260602-channel-rows"></script>
 </body>
 </html>
