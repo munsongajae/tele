@@ -3,6 +3,7 @@ import json
 import mimetypes
 import os
 import re
+import sqlite3
 import threading
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -36,7 +37,7 @@ def load_dotenv(path):
 
 load_dotenv(ROOT / ".env")
 PORT = int(os.environ.get("TELE_UI_PORT", str(PORT)))
-DOWNLOAD_DIR = Path(os.environ.get("TELE_DOWNLOAD_DIR", str(ROOT / "downloads"))).expanduser()
+DB_PATH = Path(os.environ.get("TELE_DB_PATH", str(ROOT / "tele_settings.db"))).expanduser()
 
 
 def normalize_api_id(value):
@@ -145,8 +146,7 @@ def translate_search_terms(terms):
     return deduped
 
 
-def configured_channels():
-    raw = os.environ.get("TELEGRAM_CHANNELS", "TasnimNews")
+def parse_channel_config(raw):
     channels = []
     for part in re.split(r"[\n,]+", raw):
         item = part.strip()
@@ -163,6 +163,89 @@ def configured_channels():
     return channels or [{"id": "TasnimNews", "label": "TasnimNews"}]
 
 
+def db_connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    with db_connect() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS channels (
+                id TEXT PRIMARY KEY,
+                label TEXT NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 0
+            )
+            """
+        )
+        row = conn.execute("SELECT value FROM settings WHERE key = 'download_dir'").fetchone()
+        if not row:
+            conn.execute(
+                "INSERT INTO settings(key, value) VALUES('download_dir', ?)",
+                (os.environ.get("TELE_DOWNLOAD_DIR", str(ROOT / "downloads")),),
+            )
+        count = conn.execute("SELECT COUNT(*) AS count FROM channels").fetchone()["count"]
+        if count == 0:
+            seed = parse_channel_config(os.environ.get("TELEGRAM_CHANNELS", "TasnimNews"))
+            conn.executemany(
+                "INSERT OR REPLACE INTO channels(id, label, sort_order) VALUES(?, ?, ?)",
+                [(item["id"], item["label"], index) for index, item in enumerate(seed)],
+            )
+
+
+def get_setting(key, default=""):
+    with db_connect() as conn:
+        row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+        return row["value"] if row else default
+
+
+def set_setting(key, value):
+    with db_connect() as conn:
+        conn.execute(
+            "INSERT INTO settings(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (key, value),
+        )
+
+
+def configured_channels():
+    with db_connect() as conn:
+        rows = conn.execute("SELECT id, label FROM channels ORDER BY sort_order, id").fetchall()
+    return [{"id": row["id"], "label": row["label"]} for row in rows] or [{"id": "TasnimNews", "label": "TasnimNews"}]
+
+
+def set_channels(channels):
+    normalized = []
+    for item in channels:
+        if isinstance(item, str):
+            parsed = parse_channel_config(item)
+            normalized.extend(parsed)
+            continue
+        channel = str(item.get("id") or "").strip().lstrip("@")
+        label = str(item.get("label") or channel).strip()
+        if channel:
+            normalized.append({"id": channel, "label": label or channel})
+    if not normalized:
+        raise ValueError("At least one channel is required.")
+    with db_connect() as conn:
+        conn.execute("DELETE FROM channels")
+        conn.executemany(
+            "INSERT INTO channels(id, label, sort_order) VALUES(?, ?, ?)",
+            [(item["id"], item["label"], index) for index, item in enumerate(normalized)],
+        )
+    return {"channels": configured_channels()}
+
+
 def resolve_download_dir(value):
     raw = str(value or "").strip().strip("'\"")
     if not raw:
@@ -174,16 +257,14 @@ def resolve_download_dir(value):
 
 
 def get_download_dir():
-    global DOWNLOAD_DIR
-    DOWNLOAD_DIR = resolve_download_dir(DOWNLOAD_DIR)
-    return DOWNLOAD_DIR
+    return resolve_download_dir(get_setting("download_dir", str(ROOT / "downloads")))
 
 
 def set_download_dir(value):
-    global DOWNLOAD_DIR
-    DOWNLOAD_DIR = resolve_download_dir(value)
-    DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    return {"download_dir": str(DOWNLOAD_DIR)}
+    path = resolve_download_dir(value)
+    path.mkdir(parents=True, exist_ok=True)
+    set_setting("download_dir", str(path))
+    return {"download_dir": str(path)}
 
 
 class TelegramService:
@@ -309,6 +390,7 @@ class TelegramService:
         return {"channel": channel, "items": rows, "next_offset": next_offset, "effective_searches": [t for t in terms if t]}
 
 
+init_db()
 SERVICE = TelegramService()
 TRANSLATION_CACHE = {}
 
@@ -434,7 +516,7 @@ class Handler(BaseHTTPRequestHandler):
             if parsed.path == "/api/channels":
                 return self.json_response({"channels": configured_channels()})
             if parsed.path == "/api/settings":
-                return self.json_response({"download_dir": str(get_download_dir())})
+                return self.json_response({"download_dir": str(get_download_dir()), "db_path": str(DB_PATH.resolve())})
             if parsed.path == "/api/posts":
                 query = parse_qs(parsed.query)
                 data = SERVICE.call(
@@ -471,6 +553,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(export_items(payload))
             if self.path == "/api/settings":
                 return self.json_response(set_download_dir(payload.get("download_dir")))
+            if self.path == "/api/channels":
+                return self.json_response(set_channels(payload.get("channels") or []))
             return self.json_response({"error": "not found"}, 404)
         except ApiIdInvalidError:
             return self.json_response(

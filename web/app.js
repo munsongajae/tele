@@ -12,6 +12,9 @@ const channelSelect = document.querySelector("#channelSelect");
 const downloadDir = document.querySelector("#downloadDir");
 const downloadHint = document.querySelector("#downloadHint");
 const saveDownloadDirBtn = document.querySelector("#saveDownloadDirBtn");
+const dbHint = document.querySelector("#dbHint");
+const channelList = document.querySelector("#channelList");
+const saveChannelsBtn = document.querySelector("#saveChannelsBtn");
 
 let nextOffset = null;
 let currentChannel = "TasnimNews";
@@ -20,6 +23,7 @@ let currentDateFrom = "";
 let currentDateTo = "";
 let isAuthorized = false;
 let loadedItems = [];
+let savedChannels = [];
 
 async function request(path, options = {}) {
   const response = await fetch(path, {
@@ -134,6 +138,8 @@ async function loadChannels() {
       if (typeof item === "string") return { id: item, label: item };
       return { id: item.id, label: item.label || item.id };
     }).filter((item) => item.id);
+    savedChannels = normalized;
+    channelList.value = normalized.map((item) => `${item.id}|${item.label}`).join("\n");
     channelSelect.innerHTML = [
       `<option value="">Custom channel</option>`,
       ...normalized.map((channel) => {
@@ -150,11 +156,44 @@ async function loadChannels() {
   }
 }
 
+function parseChannelList(value) {
+  return String(value || "")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [id, ...labelParts] = line.split("|");
+      const channel = id.trim().replace(/^@+/, "");
+      const label = labelParts.join("|").trim() || channel;
+      return { id: channel, label };
+    })
+    .filter((item) => item.id);
+}
+
+async function saveChannels() {
+  saveChannelsBtn.disabled = true;
+  saveChannelsBtn.textContent = "Saving...";
+  try {
+    await request("/api/channels", {
+      method: "POST",
+      body: JSON.stringify({ channels: parseChannelList(channelList.value) }),
+    });
+    await loadChannels();
+    downloadHint.textContent = "Channel list saved to local DB.";
+  } catch (error) {
+    downloadHint.textContent = error.message;
+  } finally {
+    saveChannelsBtn.textContent = "Save Channels";
+    saveChannelsBtn.disabled = false;
+  }
+}
+
 async function loadSettings() {
   try {
     const data = await request("/api/settings");
     downloadDir.value = data.download_dir || "";
     downloadHint.textContent = data.download_dir ? `Saving exports to ${data.download_dir}` : "Download folder is not set.";
+    dbHint.textContent = data.db_path ? `Local settings DB: ${data.db_path}` : "";
   } catch (error) {
     downloadHint.textContent = error.message;
   }
@@ -330,6 +369,7 @@ channelSelect.addEventListener("change", () => {
   if (channelSelect.value) document.querySelector("#channel").value = channelSelect.value;
 });
 saveDownloadDirBtn.addEventListener("click", () => saveDownloadDir());
+saveChannelsBtn.addEventListener("click", () => saveChannels());
 
 refreshStatus();
 loadChannels();
