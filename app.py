@@ -120,32 +120,6 @@ def contains_hangul(value):
     return bool(re.search(r"[가-힣]", str(value or "")))
 
 
-def translate_search_terms(terms):
-    if not terms:
-        return []
-    try:
-        from deep_translator import GoogleTranslator
-    except ImportError as exc:
-        raise RuntimeError("deep-translator is not installed. Run: py -m pip install --user deep-translator") from exc
-
-    translated = []
-    for term in terms:
-        translated.append(term)
-        if contains_hangul(term):
-            for target in ("fa", "en"):
-                candidate = GoogleTranslator(source="auto", target=target).translate(term)
-                if candidate and candidate.strip():
-                    translated.append(candidate.strip())
-    deduped = []
-    seen = set()
-    for term in translated:
-        key = term.casefold()
-        if key not in seen:
-            seen.add(key)
-            deduped.append(term)
-    return deduped
-
-
 def parse_channel_config(raw):
     channels = []
     for part in re.split(r"[\n,]+", raw):
@@ -362,7 +336,6 @@ class TelegramService:
         offset_id=0,
         date_from=None,
         date_to=None,
-        korean_search=False,
         content_filter="all",
     ):
         client = await self._ensure_client()
@@ -373,8 +346,6 @@ class TelegramService:
         start_dt = parse_local_datetime(date_from)
         end_dt = parse_local_datetime(date_to, end_of_day=True)
         terms = split_search_terms(search)
-        if korean_search:
-            terms = translate_search_terms(terms)
         if not terms:
             terms = [None]
 
@@ -413,55 +384,6 @@ class TelegramService:
 
 init_db()
 SERVICE = TelegramService()
-TRANSLATION_CACHE = {}
-
-
-def chunk_text(text, size=4500):
-    text = text.strip()
-    if not text:
-        return []
-    chunks = []
-    while len(text) > size:
-        split_at = text.rfind("\n", 0, size)
-        if split_at < size // 2:
-            split_at = text.rfind(" ", 0, size)
-        if split_at < size // 2:
-            split_at = size
-        chunks.append(text[:split_at].strip())
-        text = text[split_at:].strip()
-    if text:
-        chunks.append(text)
-    return chunks
-
-
-def translate_to_korean(text):
-    text = (text or "").strip()
-    if not text:
-        return ""
-    if text in TRANSLATION_CACHE:
-        return TRANSLATION_CACHE[text]
-    try:
-        from deep_translator import GoogleTranslator
-    except ImportError as exc:
-        raise RuntimeError("deep-translator is not installed. Run: py -m pip install --user deep-translator") from exc
-
-    translator = GoogleTranslator(source="auto", target="ko")
-    translated = "\n".join(translator.translate(part) for part in chunk_text(text))
-    TRANSLATION_CACHE[text] = translated
-    return translated
-
-
-def translate_items(items):
-    rows = []
-    for item in items:
-        text = item.get("text") or ""
-        rows.append(
-            {
-                "id": item.get("id"),
-                "translation_ko": translate_to_korean(text),
-            }
-        )
-    return {"items": rows}
 
 
 def file_safe(value):
@@ -504,8 +426,6 @@ def build_ai_markdown(channel, search, items, date_from=None, date_to=None):
         if item.get("has_media"):
             lines.append(f"Media: {item.get('media_type') or 'yes'}")
         lines.append("")
-        if item.get("translation_ko"):
-            lines.extend(["### Korean translation", "", markdown_text(item.get("translation_ko")) or "(empty)", ""])
         lines.extend(["### Original", "", markdown_text(item.get("text")) or "(media/no text)", ""])
     return "\n".join(lines)
 
@@ -548,7 +468,6 @@ class Handler(BaseHTTPRequestHandler):
                         offset_id=query.get("offset_id", ["0"])[0] or 0,
                         date_from=query.get("date_from", [""])[0] or None,
                         date_to=query.get("date_to", [""])[0] or None,
-                        korean_search=query.get("korean_search", ["false"])[0].lower() == "true",
                         content_filter=query.get("content_filter", ["all"])[0],
                     )
                 )
@@ -568,8 +487,6 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == "/api/verify":
                 data = SERVICE.call(SERVICE.verify_code(payload.get("code"), payload.get("password")))
                 return self.json_response(data)
-            if self.path == "/api/translate":
-                return self.json_response(translate_items(payload.get("items") or []))
             if self.path == "/api/export":
                 return self.json_response(export_items(payload))
             if self.path == "/api/settings":

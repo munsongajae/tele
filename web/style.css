@@ -306,28 +306,6 @@ p {
   font-size: 15px;
 }
 
-.translation {
-  margin-top: 12px;
-  border-left: 3px solid var(--green);
-  background: #f0faf6;
-  border-radius: 6px;
-  padding: 10px 12px;
-}
-
-.translationLabel {
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.translationText {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-height: 1.55;
-  font-size: 15px;
-}
-
 .postText:lang(fa),
 .rtl {
   direction: rtl;

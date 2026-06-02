@@ -5,7 +5,6 @@ const posts = document.querySelector("#posts");
 const resultTitle = document.querySelector("#resultTitle");
 const resultMeta = document.querySelector("#resultMeta");
 const loadMoreBtn = document.querySelector("#loadMoreBtn");
-const translateBtn = document.querySelector("#translateBtn");
 const downloadBtn = document.querySelector("#downloadBtn");
 const authHint = document.querySelector("#authHint");
 const channelSelect = document.querySelector("#channelSelect");
@@ -79,9 +78,6 @@ function fileSafe(value) {
 function postCard(item) {
   const text = item.text || "(media/no text)";
   const dirClass = likelyRtl(text) ? "rtl" : "";
-  const translation = item.translation_ko
-    ? `<div class="translation"><div class="translationLabel">Korean translation</div><div class="translationText">${escapeHtml(item.translation_ko)}</div></div>`
-    : "";
   const meta = [
     `#${item.id}`,
     formatDate(item.date),
@@ -95,7 +91,6 @@ function postCard(item) {
     <article class="post">
       <div class="postMeta">${meta.map(escapeHtml).join("<span> - </span>")}</div>
       <div class="postText ${dirClass}">${escapeHtml(text)}</div>
-      ${translation}
       <div class="postActions"><a href="${escapeHtml(item.link)}" target="_blank" rel="noreferrer">Open in Telegram</a></div>
     </article>
   `;
@@ -315,7 +310,6 @@ async function loadPosts({ append = false } = {}) {
   if (currentSearch) params.set("search", currentSearch);
   if (currentDateFrom) params.set("date_from", currentDateFrom);
   if (currentDateTo) params.set("date_to", currentDateTo);
-  if (document.querySelector("#koreanSearch").checked) params.set("korean_search", "true");
   params.set("content_filter", document.querySelector("#contentFilter").value);
   if (append && nextOffset) params.set("offset_id", nextOffset);
 
@@ -338,7 +332,6 @@ async function loadPosts({ append = false } = {}) {
     }
     nextOffset = data.next_offset;
     loadMoreBtn.disabled = !nextOffset || !data.items.length;
-    translateBtn.disabled = !loadedItems.length;
     downloadBtn.disabled = !loadedItems.length;
     resultTitle.textContent = `@${data.channel}`;
     const filterBits = [];
@@ -352,34 +345,6 @@ async function loadPosts({ append = false } = {}) {
   } catch (error) {
     renderError(error.message);
     resultMeta.textContent = "Load failed.";
-  }
-}
-
-async function translateLoaded() {
-  if (!loadedItems.length) return;
-  translateBtn.disabled = true;
-  translateBtn.textContent = "Translating...";
-  try {
-    const data = await request("/api/translate", {
-      method: "POST",
-      body: JSON.stringify({
-        items: loadedItems.map((item) => ({ id: item.id, text: item.text || "" })),
-      }),
-    });
-    const byId = new Map(data.items.map((item) => [item.id, item.translation_ko]));
-    loadedItems = loadedItems.map((item) => ({
-      ...item,
-      translation_ko: byId.get(item.id) || item.translation_ko || "",
-    }));
-    renderPosts();
-    resultMeta.textContent = `${loadedItems.length} loaded · translated to Korean${currentSearch ? ` · search: ${currentSearch}` : ""}`;
-  } catch (error) {
-    renderError(error.message);
-    resultMeta.textContent = "Translation failed.";
-  } finally {
-    translateBtn.textContent = "Translate Loaded";
-    translateBtn.disabled = !loadedItems.length;
-    downloadBtn.disabled = !loadedItems.length;
   }
 }
 
@@ -413,7 +378,6 @@ document.querySelector("#connectBtn").addEventListener("click", () => connect().
 document.querySelector("#verifyBtn").addEventListener("click", () => verify().catch((error) => setStatus(error.message)));
 document.querySelector("#loadBtn").addEventListener("click", () => loadPosts());
 loadMoreBtn.addEventListener("click", () => loadPosts({ append: true }));
-translateBtn.addEventListener("click", () => translateLoaded());
 downloadBtn.addEventListener("click", () => downloadForAi());
 channelSelect.addEventListener("change", () => {
   if (channelSelect.value) document.querySelector("#channel").value = channelSelect.value;
