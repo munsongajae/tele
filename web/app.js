@@ -17,6 +17,8 @@ const channelRows = document.querySelector("#channelRows");
 const saveChannelsBtn = document.querySelector("#saveChannelsBtn");
 const browseDownloadDirBtn = document.querySelector("#browseDownloadDirBtn");
 const addChannelBtn = document.querySelector("#addChannelBtn");
+const settingsPanel = document.querySelector("#settingsPanel");
+const toggleSettingsBtn = document.querySelector("#toggleSettingsBtn");
 
 let nextOffset = null;
 let currentChannel = "TasnimNews";
@@ -128,6 +130,11 @@ function renderPosts() {
   posts.innerHTML = loadedItems.length
     ? loadedItems.map(postCard).join("")
     : `<div class="empty">No posts found.</div>`;
+}
+
+function setSettingsExpanded(expanded) {
+  settingsPanel.classList.toggle("collapsed", !expanded);
+  toggleSettingsBtn.textContent = expanded ? "Collapse" : "Expand";
 }
 
 async function refreshStatus() {
@@ -415,6 +422,9 @@ saveDownloadDirBtn.addEventListener("click", () => saveDownloadDir());
 saveChannelsBtn.addEventListener("click", () => saveChannels());
 browseDownloadDirBtn.addEventListener("click", () => browseDownloadDir());
 addChannelBtn.addEventListener("click", () => channelRows.appendChild(channelRow()));
+toggleSettingsBtn.addEventListener("click", () => {
+  setSettingsExpanded(settingsPanel.classList.contains("collapsed"));
+});
 
 refreshStatus();
 loadChannels();

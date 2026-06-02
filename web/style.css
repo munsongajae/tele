@@ -136,6 +136,31 @@ p {
   margin-bottom: 14px;
 }
 
+.settingsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.settingsBody {
+  margin-top: 14px;
+}
+
+.settingsPanel.collapsed .settingsBody,
+.settingsPanel.collapsed #dbHint {
+  display: none;
+}
+
+.secondaryButton {
+  background: #6c7480;
+}
+
+.secondaryButton:hover {
+  background: #4d5560;
+}
+
 .grid {
   display: grid;
   gap: 12px;

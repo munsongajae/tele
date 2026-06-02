@@ -49,27 +49,32 @@
       </div>
     </section>
 
-    <section class="panel settingsPanel">
-      <div class="panelHeader">
-        <h2>Export Settings</h2>
-        <p id="downloadHint">Loading download folder...</p>
-        <p id="dbHint"></p>
-      </div>
-      <div class="settingsRow">
-        <label>
-          <span>Download folder</span>
-          <input id="downloadDir" autocomplete="off" placeholder="C:\tele\downloads">
-        </label>
-        <button id="browseDownloadDirBtn">Browse</button>
-        <button id="saveDownloadDirBtn">Save Folder</button>
-      </div>
-      <div class="channelSettingsRow">
-        <div class="channelSettingsHeader">
-          <span>Saved channel list</span>
-          <button id="addChannelBtn">Add Channel</button>
+    <section class="panel settingsPanel collapsed" id="settingsPanel">
+      <div class="panelHeader settingsHeader">
+        <div>
+          <h2>Settings</h2>
+          <p id="downloadHint">Loading download folder...</p>
+          <p id="dbHint"></p>
         </div>
-        <div id="channelRows" class="channelRows"></div>
-        <button id="saveChannelsBtn">Save Channels</button>
+        <button id="toggleSettingsBtn" class="secondaryButton">Expand</button>
+      </div>
+      <div class="settingsBody" id="settingsBody">
+        <div class="settingsRow">
+          <label>
+            <span>Download folder</span>
+            <input id="downloadDir" autocomplete="off" placeholder="C:\tele\downloads">
+          </label>
+          <button id="browseDownloadDirBtn">Browse</button>
+          <button id="saveDownloadDirBtn">Save Folder</button>
+        </div>
+        <div class="channelSettingsRow">
+          <div class="channelSettingsHeader">
+            <span>Saved channel list</span>
+            <button id="addChannelBtn">Add Channel</button>
+          </div>
+          <div id="channelRows" class="channelRows"></div>
+          <button id="saveChannelsBtn">Save Channels</button>
+        </div>
       </div>
     </section>
 
@@ -136,6 +141,6 @@
 
     <section id="posts" class="posts"></section>
   </main>
-  <script src="/app.js?v=20260602-channel-rows"></script>
+  <script src="/app.js?v=20260602-settings-collapse"></script>
 </body>
 </html>
