@@ -1,0 +1,11 @@
+.env
+*.session
+*.session-journal
+__pycache__/
+*.py[cod]
+downloads/
+*.db
+*.db-journal
+*.png
+.DS_Store
+Thumbs.db
