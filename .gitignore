@@ -9,3 +9,11 @@ downloads/
 *.png
 .DS_Store
 Thumbs.db
+build/
+dist/
+*.exe
+*.zip
+*.log
+app_py_diff*.txt
+tmp/
+docs/rendered/

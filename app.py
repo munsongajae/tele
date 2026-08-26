@@ -4,20 +4,60 @@ import mimetypes
 import os
 import re
 import sqlite3
+import shutil
 import threading
+import time
+import webbrowser
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlencode, urlparse
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 from telethon import TelegramClient
-from telethon.errors import ApiIdInvalidError, SendCodeUnavailableError, SessionPasswordNeededError
+from telethon.errors import ApiIdInvalidError, FloodWaitError, SendCodeUnavailableError, SessionPasswordNeededError
 
 
-ROOT = Path(__file__).resolve().parent
-WEB = ROOT / "web"
+import sys
+
+if getattr(sys, 'frozen', False):
+    ROOT = Path(sys.executable).resolve().parent
+else:
+    ROOT = Path(__file__).resolve().parent
+
+
+def default_data_root():
+    if not getattr(sys, "frozen", False):
+        return ROOT
+    base = os.environ.get("LOCALAPPDATA") or os.environ.get("APPDATA")
+    if base:
+        return Path(base) / "TelegramChannelReader"
+    return ROOT
+
+
+DATA_ROOT = Path(os.environ.get("TELE_DATA_DIR", str(default_data_root()))).expanduser()
+DATA_ROOT.mkdir(parents=True, exist_ok=True)
+
+
+def migrate_runtime_file(name):
+    if not getattr(sys, "frozen", False):
+        return
+    source = ROOT / name
+    target = DATA_ROOT / name
+    if source.exists() and not target.exists():
+        shutil.copy2(source, target)
+
+
+for runtime_file in (".env", "tele_settings.db", "telegram_user.session"):
+    migrate_runtime_file(runtime_file)
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    WEB = Path(sys._MEIPASS) / "web"
+else:
+    WEB = ROOT / "web"
+
 HOST = "127.0.0.1"
 PORT = int(os.environ.get("TELE_UI_PORT", "8788"))
 LOCAL_TZ = timezone(timedelta(hours=9))
@@ -38,10 +78,17 @@ def load_dotenv(path):
 
 
 load_dotenv(ROOT / ".env")
+load_dotenv(DATA_ROOT / ".env")
 PORT = int(os.environ.get("TELE_UI_PORT", str(PORT)))
-DB_PATH = Path(os.environ.get("TELE_DB_PATH", str(ROOT / "tele_settings.db"))).expanduser()
+DB_PATH = Path(os.environ.get("TELE_DB_PATH", str(DATA_ROOT / "tele_settings.db"))).expanduser()
 REQUEST_TIMEOUT = float(os.environ.get("TELE_REQUEST_TIMEOUT", "120"))
+DOWNLOAD_TIMEOUT = float(os.environ.get("TELE_DOWNLOAD_TIMEOUT", "3600"))
 TRANSLATE_TIMEOUT = float(os.environ.get("TELE_TRANSLATE_TIMEOUT", "6"))
+AUTO_SHUTDOWN_ON_BROWSER_CLOSE = (
+    str(os.environ.get("TELE_AUTO_SHUTDOWN_ON_BROWSER_CLOSE") or "").strip().lower()
+    in {"1", "true", "yes", "on"}
+)
+SESSION_PREFIX = DATA_ROOT / "telegram_user"
 
 
 def normalize_api_id(value):
@@ -127,39 +174,152 @@ def truthy(value):
     return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
-def translate_term_to_persian(term):
-    query = urlencode({"client": "gtx", "sl": "auto", "tl": "fa", "dt": "t", "q": term})
+TRANSLATION_LANGUAGES = {
+    "fa": "페르시아어",
+    "ru": "러시아어",
+    "zh-CN": "중국어",
+    "en": "영어",
+}
+NEWS_TERM_TRANSLATIONS = {
+    "미국": {"fa": "آمریکا", "ru": "США", "zh-CN": "美国", "en": "United States"},
+    "이란": {"fa": "ایران", "ru": "Иран", "zh-CN": "伊朗", "en": "Iran"},
+    "이스라엘": {"fa": "اسرائیل", "ru": "Израиль", "zh-CN": "以色列", "en": "Israel"},
+    "러시아": {"fa": "روسیه", "ru": "Россия", "zh-CN": "俄罗斯", "en": "Russia"},
+    "우크라이나": {"fa": "اوکراین", "ru": "Украина", "zh-CN": "乌克兰", "en": "Ukraine"},
+    "중국": {"fa": "چین", "ru": "Китай", "zh-CN": "中国", "en": "China"},
+    "대만": {"fa": "تایوان", "ru": "Тайвань", "zh-CN": "台湾", "en": "Taiwan"},
+    "북한": {"fa": "کره شمالی", "ru": "Северная Корея", "zh-CN": "朝鲜", "en": "North Korea"},
+    "한국": {"fa": "کره جنوبی", "ru": "Южная Корея", "zh-CN": "韩国", "en": "South Korea"},
+    "트럼프": {"fa": "ترامپ", "ru": "Трамп", "zh-CN": "特朗普", "en": "Trump"},
+    "푸틴": {"fa": "پوتین", "ru": "Путин", "zh-CN": "普京", "en": "Putin"},
+    "젤렌스키": {"fa": "زلنسکی", "ru": "Зеленский", "zh-CN": "泽连斯基", "en": "Zelensky"},
+    "하메네이": {"fa": "خامنه‌ای", "ru": "Хаменеи", "zh-CN": "哈梅内伊", "en": "Khamenei"},
+    "전쟁": {"fa": "جنگ", "ru": "война", "zh-CN": "战争", "en": "war"},
+    "공격": {"fa": "حمله", "ru": "атака", "zh-CN": "袭击", "en": "attack"},
+    "공습": {"fa": "حمله هوایی", "ru": "авиаудар", "zh-CN": "空袭", "en": "airstrike"},
+    "미사일": {"fa": "موشک", "ru": "ракета", "zh-CN": "导弹", "en": "missile"},
+    "드론": {"fa": "پهپاد", "ru": "беспилотник", "zh-CN": "无人机", "en": "drone"},
+    "핵": {"fa": "هسته‌ای", "ru": "ядерный", "zh-CN": "核", "en": "nuclear"},
+    "협상": {"fa": "مذاکرات", "ru": "переговоры", "zh-CN": "谈判", "en": "negotiations"},
+    "휴전": {"fa": "آتش‌بس", "ru": "перемирие", "zh-CN": "停火", "en": "ceasefire"},
+    "제재": {"fa": "تحریم", "ru": "санкции", "zh-CN": "制裁", "en": "sanctions"},
+    "대통령": {"fa": "رئیس‌جمهور", "ru": "президент", "zh-CN": "总统", "en": "president"},
+    "군대": {"fa": "ارتش", "ru": "армия", "zh-CN": "军队", "en": "military"},
+    "사망": {"fa": "کشته", "ru": "погиб", "zh-CN": "死亡", "en": "killed"},
+    "지진": {"fa": "زلزله", "ru": "землетрясение", "zh-CN": "地震", "en": "earthquake"},
+    "폭발": {"fa": "انفجار", "ru": "взрыв", "zh-CN": "爆炸", "en": "explosion"},
+    "화재": {"fa": "آتش‌سوزی", "ru": "пожар", "zh-CN": "火灾", "en": "fire"},
+    "홍수": {"fa": "سیل", "ru": "наводнение", "zh-CN": "洪水", "en": "flood"},
+    "항공기": {"fa": "هواپیما", "ru": "самолёт", "zh-CN": "飞机", "en": "aircraft"},
+    "선박": {"fa": "کشتی", "ru": "судно", "zh-CN": "船舶", "en": "ship"},
+}
+TRANSLATION_CACHE = {}
+
+
+def normalize_translation_languages(value):
+    if isinstance(value, str):
+        values = value.split(",")
+    elif isinstance(value, (list, tuple, set)):
+        values = value
+    else:
+        values = []
+    result = []
+    for item in values:
+        code = str(item or "").strip()
+        if code in TRANSLATION_LANGUAGES and code not in result:
+            result.append(code)
+    return result
+
+
+def local_news_translation(term, language):
+    normalized = re.sub(r"\s+", " ", str(term or "").strip())
+    if normalized in NEWS_TERM_TRANSLATIONS:
+        return NEWS_TERM_TRANSLATIONS[normalized].get(language, "")
+    words = normalized.split(" ")
+    if len(words) > 1 and all(NEWS_TERM_TRANSLATIONS.get(word, {}).get(language) for word in words):
+        return " ".join(NEWS_TERM_TRANSLATIONS[word][language] for word in words)
+    return ""
+
+
+def translate_term(term, language):
+    if language not in TRANSLATION_LANGUAGES:
+        raise ValueError("Unsupported translation language.")
+    local_value = local_news_translation(term, language)
+    if local_value:
+        return local_value
+    cache_key = (language, str(term or "").strip().casefold())
+    if cache_key in TRANSLATION_CACHE:
+        return TRANSLATION_CACHE[cache_key]
+    query = urlencode({"client": "gtx", "sl": "auto", "tl": language, "dt": "t", "q": term})
     url = f"https://translate.googleapis.com/translate_a/single?{query}"
-    with urlopen(url, timeout=TRANSLATE_TIMEOUT) as response:
+    request = Request(url, headers={"User-Agent": "Mozilla/5.0 TelegramChannelReader/1.0"})
+    with urlopen(request, timeout=TRANSLATE_TIMEOUT) as response:
         data = json.loads(response.read().decode("utf-8"))
     translated = "".join(segment[0] for segment in data[0] if segment and segment[0]).strip()
+    if translated:
+        TRANSLATION_CACHE[cache_key] = translated
     return translated
 
 
-def expand_search_terms(search, translate_to_persian=False):
+def translation_warning(exc):
+    if isinstance(exc, HTTPError) and exc.code == 429:
+        return "자동 번역 사용량이 많아 변환하지 못한 검색어는 제외했습니다. 잠시 후 다시 시도해 주세요."
+    return "자동 번역에 연결하지 못해 변환하지 못한 검색어는 제외했습니다."
+
+
+def expand_search_terms(search, translate_languages=None):
     terms = split_search_terms(search)
     if not terms:
         return [None], [], None
-    if not translate_to_persian:
+    languages = normalize_translation_languages(translate_languages)
+    if not languages:
         return terms, [], None
 
     translated = []
-    try:
-        for term in terms:
-            value = translate_term_to_persian(term)
-            if value and value.casefold() != term.casefold():
-                translated.append(value)
-    except Exception as exc:
-        return terms, [], f"Persian translation failed: {exc}"
+    effective = []
+    warning = None
+    for term in terms:
+        if not contains_hangul(term):
+            effective.append(term)
+            continue
+        for language in languages:
+            try:
+                value = translate_term(term, language)
+                if value and value.casefold() != term.casefold():
+                    translated.append(value)
+                    effective.append(value)
+            except Exception as exc:
+                warning = translation_warning(exc)
 
     merged = []
     seen = set()
-    for term in [*terms, *translated]:
+    for term in effective:
         key = term.casefold()
         if key not in seen:
             seen.add(key)
             merged.append(term)
-    return merged, translated, None
+    return merged, translated, warning
+
+
+def translate_result_search(search, translate_languages=None):
+    languages = normalize_translation_languages(translate_languages)
+    source_terms = [part.strip() for part in re.split(r"[\s,]+", str(search or "")) if part.strip()]
+    groups = []
+    warning = None
+    for term in source_terms:
+        if not languages or not contains_hangul(term):
+            groups.append([term])
+            continue
+        alternatives = []
+        for language in languages:
+            try:
+                value = translate_term(term, language)
+                if value and value.casefold() not in {item.casefold() for item in alternatives}:
+                    alternatives.append(value)
+            except Exception as exc:
+                warning = translation_warning(exc)
+        groups.append(alternatives)
+    return {"groups": groups, "warning": warning, "languages": languages}
 
 
 def parse_offset_state(value):
@@ -195,13 +355,22 @@ def parse_channel_config(raw):
         label = label.strip()
         if channel:
             channels.append({"id": channel, "label": label or channel})
-    return channels or [{"id": "TasnimNews", "label": "TasnimNews"}]
+    return channels or [
+        {"id": "TasnimNews", "label": "타스님뉴스"},
+        {"id": "farsna", "label": "파르스뉴스"},
+        {"id": "sepahcybery", "label": "세파 사이버"},
+        {"id": "mehrnews", "label": "메흐르뉴스"},
+        {"id": "Irna_en", "label": "IRNA 영문"},
+        {"id": "iribnews", "label": "IRIB 뉴스"},
+        {"id": "Nournews_ir", "label": "누르뉴스"},
+    ]
 
 
 def db_connect():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
@@ -224,15 +393,36 @@ def init_db():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS channel_groups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                sort_order INTEGER NOT NULL DEFAULT 0
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS channel_group_members (
+                group_id INTEGER NOT NULL,
+                channel_id TEXT NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY (group_id, channel_id),
+                FOREIGN KEY (group_id) REFERENCES channel_groups(id) ON DELETE CASCADE,
+                FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
+            )
+            """
+        )
         row = conn.execute("SELECT value FROM settings WHERE key = 'download_dir'").fetchone()
         if not row:
             conn.execute(
                 "INSERT INTO settings(key, value) VALUES('download_dir', ?)",
-                (os.environ.get("TELE_DOWNLOAD_DIR", str(ROOT / "downloads")),),
+                (os.environ.get("TELE_DOWNLOAD_DIR", str(DATA_ROOT / "downloads")),),
             )
         count = conn.execute("SELECT COUNT(*) AS count FROM channels").fetchone()["count"]
         if count == 0:
-            seed = parse_channel_config(os.environ.get("TELEGRAM_CHANNELS", "TasnimNews"))
+            seed = parse_channel_config(os.environ.get("TELEGRAM_CHANNELS", "TasnimNews|타스님뉴스,farsna|파르스뉴스,sepahcybery|세파 사이버,mehrnews|메흐르뉴스,Irna_en|IRNA 영문,iribnews|IRIB 뉴스,Nournews_ir|누르뉴스"))
             conn.executemany(
                 "INSERT OR REPLACE INTO channels(id, label, sort_order) VALUES(?, ?, ?)",
                 [(item["id"], item["label"], index) for index, item in enumerate(seed)],
@@ -256,7 +446,15 @@ def set_setting(key, value):
 def configured_channels():
     with db_connect() as conn:
         rows = conn.execute("SELECT id, label FROM channels ORDER BY sort_order, id").fetchall()
-    return [{"id": row["id"], "label": row["label"]} for row in rows] or [{"id": "TasnimNews", "label": "TasnimNews"}]
+    return [{"id": row["id"], "label": row["label"]} for row in rows] or [
+        {"id": "TasnimNews", "label": "타스님뉴스"},
+        {"id": "farsna", "label": "파르스뉴스"},
+        {"id": "sepahcybery", "label": "세파 사이버"},
+        {"id": "mehrnews", "label": "메흐르뉴스"},
+        {"id": "Irna_en", "label": "IRNA 영문"},
+        {"id": "iribnews", "label": "IRIB 뉴스"},
+        {"id": "Nournews_ir", "label": "누르뉴스"},
+    ]
 
 
 def set_channels(channels):
@@ -272,13 +470,129 @@ def set_channels(channels):
             normalized.append({"id": channel, "label": label or channel})
     if not normalized:
         raise ValueError("At least one channel is required.")
+    unique = []
+    seen = set()
+    for item in normalized:
+        key = item["id"].casefold()
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    normalized = unique
     with db_connect() as conn:
-        conn.execute("DELETE FROM channels")
-        conn.executemany(
-            "INSERT INTO channels(id, label, sort_order) VALUES(?, ?, ?)",
-            [(item["id"], item["label"], index) for index, item in enumerate(normalized)],
+        for index, item in enumerate(normalized):
+            conn.execute(
+                """
+                INSERT INTO channels(id, label, sort_order) VALUES(?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET label = excluded.label, sort_order = excluded.sort_order
+                """,
+                (item["id"], item["label"], index),
+            )
+        placeholders = ",".join("?" for _ in normalized)
+        conn.execute(
+            f"DELETE FROM channels WHERE id NOT IN ({placeholders})",
+            [item["id"] for item in normalized],
         )
     return {"channels": configured_channels()}
+
+
+def configured_channel_groups():
+    with db_connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT g.id, g.name, m.channel_id, m.sort_order AS member_order
+            FROM channel_groups AS g
+            LEFT JOIN channel_group_members AS m ON m.group_id = g.id
+            ORDER BY g.sort_order, g.id, m.sort_order, m.channel_id
+            """
+        ).fetchall()
+    groups = []
+    by_id = {}
+    for row in rows:
+        group_id = row["id"]
+        group = by_id.get(group_id)
+        if group is None:
+            group = {"id": group_id, "name": row["name"], "channel_ids": []}
+            by_id[group_id] = group
+            groups.append(group)
+        if row["channel_id"]:
+            group["channel_ids"].append(row["channel_id"])
+    return groups
+
+
+def channels_for_group(group_id):
+    with db_connect() as conn:
+        group = conn.execute("SELECT id, name FROM channel_groups WHERE id = ?", (int(group_id),)).fetchone()
+        if not group:
+            raise ValueError("Monitoring list was not found.")
+        rows = conn.execute(
+            """
+            SELECT c.id, c.label
+            FROM channel_group_members AS m
+            JOIN channels AS c ON c.id = m.channel_id
+            WHERE m.group_id = ?
+            ORDER BY m.sort_order, c.sort_order, c.id
+            """,
+            (group["id"],),
+        ).fetchall()
+    return group["name"], [{"id": row["id"], "label": row["label"]} for row in rows]
+
+
+def set_channel_groups(groups):
+    if not isinstance(groups, list):
+        raise ValueError("Monitoring lists must be an array.")
+    channel_ids = {item["id"] for item in configured_channels()}
+    normalized = []
+    seen_names = set()
+    for item in groups:
+        name = str(item.get("name") or "").strip()
+        if not name:
+            raise ValueError("Every monitoring list needs a name.")
+        name_key = name.casefold()
+        if name_key in seen_names:
+            raise ValueError(f"Duplicate monitoring list name: {name}")
+        seen_names.add(name_key)
+        members = []
+        seen_members = set()
+        for channel_id in item.get("channel_ids") or []:
+            channel_id = str(channel_id or "").strip().lstrip("@")
+            if channel_id in channel_ids and channel_id not in seen_members:
+                seen_members.add(channel_id)
+                members.append(channel_id)
+        raw_id = item.get("id")
+        normalized.append({
+            "id": int(raw_id) if str(raw_id or "").isdigit() else None,
+            "name": name,
+            "channel_ids": members,
+        })
+
+    with db_connect() as conn:
+        existing_ids = {row["id"] for row in conn.execute("SELECT id FROM channel_groups")}
+        kept_ids = []
+        for index, item in enumerate(normalized):
+            group_id = item["id"]
+            if group_id in existing_ids:
+                conn.execute(
+                    "UPDATE channel_groups SET name = ?, sort_order = ? WHERE id = ?",
+                    (item["name"], index, group_id),
+                )
+            else:
+                cursor = conn.execute(
+                    "INSERT INTO channel_groups(name, sort_order) VALUES(?, ?)",
+                    (item["name"], index),
+                )
+                group_id = cursor.lastrowid
+            kept_ids.append(group_id)
+            conn.execute("DELETE FROM channel_group_members WHERE group_id = ?", (group_id,))
+            conn.executemany(
+                "INSERT INTO channel_group_members(group_id, channel_id, sort_order) VALUES(?, ?, ?)",
+                [(group_id, channel_id, member_index) for member_index, channel_id in enumerate(item["channel_ids"])],
+            )
+        if kept_ids:
+            placeholders = ",".join("?" for _ in kept_ids)
+            conn.execute(f"DELETE FROM channel_groups WHERE id NOT IN ({placeholders})", kept_ids)
+        else:
+            conn.execute("DELETE FROM channel_groups")
+    return {"groups": configured_channel_groups()}
 
 
 def resolve_download_dir(value):
@@ -287,12 +601,12 @@ def resolve_download_dir(value):
         raise ValueError("Download directory is empty.")
     path = Path(raw).expanduser()
     if not path.is_absolute():
-        path = ROOT / path
+        path = DATA_ROOT / path
     return path.resolve()
 
 
 def get_download_dir():
-    return resolve_download_dir(get_setting("download_dir", str(ROOT / "downloads")))
+    return resolve_download_dir(get_setting("download_dir", str(DATA_ROOT / "downloads")))
 
 
 def set_download_dir(value):
@@ -323,6 +637,27 @@ def pick_download_dir():
     return set_download_dir(selected)
 
 
+LAST_HEARTBEAT = time.time()
+HEARTBEAT_RECEIVED = False
+
+
+def heartbeat_monitor(server):
+    global LAST_HEARTBEAT, HEARTBEAT_RECEIVED
+    start_time = time.time()
+    while True:
+        time.sleep(5)
+        if HEARTBEAT_RECEIVED:
+            if time.time() - LAST_HEARTBEAT > 30:
+                print("No heartbeat received for 30 seconds. Shutting down server...")
+                threading.Thread(target=server.shutdown, daemon=True).start()
+                break
+        else:
+            if time.time() - start_time > 60:
+                print("No initial heartbeat received for 60 seconds. Shutting down server...")
+                threading.Thread(target=server.shutdown, daemon=True).start()
+                break
+
+
 class TelegramService:
     def __init__(self):
         self.loop = asyncio.new_event_loop()
@@ -331,17 +666,37 @@ class TelegramService:
         self.client = None
         self.client_lock = None
         self.request_timeout = REQUEST_TIMEOUT
-        self.api_id = normalize_api_id(os.environ["TELEGRAM_API_ID"]) if os.environ.get("TELEGRAM_API_ID") else None
-        self.api_hash = normalize_api_hash(os.environ["TELEGRAM_API_HASH"]) if os.environ.get("TELEGRAM_API_HASH") else None
-        self.phone = os.environ.get("TELEGRAM_PHONE")
 
-    def call(self, coro):
+        # DB 초기화
+        init_db()
+
+        # 환경변수 우선 적용, 없으면 DB에서 조회
+        raw_api_id = os.environ.get("TELEGRAM_API_ID") or get_setting("telegram_api_id")
+        raw_api_hash = os.environ.get("TELEGRAM_API_HASH") or get_setting("telegram_api_hash")
+        
+        self.api_id = None
+        self.api_hash = None
+        self.phone = os.environ.get("TELEGRAM_PHONE") or get_setting("telegram_phone") or None
+
+        if raw_api_id:
+            try:
+                self.api_id = normalize_api_id(raw_api_id)
+            except ValueError:
+                pass
+        if raw_api_hash:
+            try:
+                self.api_hash = normalize_api_hash(raw_api_hash)
+            except ValueError:
+                pass
+
+    def call(self, coro, timeout=None):
+        timeout = self.request_timeout if timeout is None else float(timeout)
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
         try:
-            return future.result(timeout=self.request_timeout)
+            return future.result(timeout=timeout)
         except FutureTimeoutError as exc:
             future.cancel()
-            raise TimeoutError(f"Telegram request timed out after {self.request_timeout:g} seconds.") from exc
+            raise TimeoutError(f"Telegram request timed out after {timeout:g} seconds.") from exc
 
     def lock(self):
         if self.client_lock is None:
@@ -354,12 +709,15 @@ class TelegramService:
                 await self.client.disconnect()
             self.api_id = normalize_api_id(api_id)
             self.api_hash = normalize_api_hash(api_hash)
-            self.client = TelegramClient(str(ROOT / "telegram_user"), self.api_id, self.api_hash)
+            # 입력받은 값을 즉시 로컬 DB에 영구 저장
+            set_setting("telegram_api_id", str(self.api_id))
+            set_setting("telegram_api_hash", self.api_hash)
+            self.client = TelegramClient(str(SESSION_PREFIX), self.api_id, self.api_hash)
 
         if not self.client:
             if not self.api_id or not self.api_hash:
                 raise RuntimeError("API credentials are not configured.")
-            self.client = TelegramClient(str(ROOT / "telegram_user"), self.api_id, self.api_hash)
+            self.client = TelegramClient(str(SESSION_PREFIX), self.api_id, self.api_hash)
 
         if not self.client.is_connected():
             await self.client.connect()
@@ -372,6 +730,8 @@ class TelegramService:
             else:
                 client = await self._ensure_client()
             self.phone = phone or self.phone
+            if self.phone:
+                set_setting("telegram_phone", self.phone)
             if await client.is_user_authorized():
                 return {"authorized": True, "code_required": False}
             if not self.phone:
@@ -407,9 +767,18 @@ class TelegramService:
             return {
                 "configured": True,
                 "authorized": await self.client.is_user_authorized(),
-                "session": str(ROOT / "telegram_user.session"),
+                "session": str(SESSION_PREFIX.with_suffix(".session")),
                 "phone_configured": bool(self.phone),
             }
+
+    def close(self):
+        if self.client:
+            future = asyncio.run_coroutine_threadsafe(self.client.disconnect(), self.loop)
+            try:
+                future.result(timeout=10)
+            except Exception:
+                pass
+        self.loop.call_soon_threadsafe(self.loop.stop)
 
     async def posts(
         self,
@@ -420,7 +789,7 @@ class TelegramService:
         date_from=None,
         date_to=None,
         content_filter="all",
-        translate_search=False,
+        translate_languages=None,
     ):
         async with self.lock():
             client = await self._ensure_client()
@@ -430,7 +799,7 @@ class TelegramService:
             final_limit = max(1, min(int(limit), 1000))
             start_dt = parse_local_datetime(date_from)
             end_dt = parse_local_datetime(date_to, end_of_day=True)
-            terms, translated_terms, translation_warning = expand_search_terms(search, translate_search)
+            terms, translated_terms, translation_warning = expand_search_terms(search, translate_languages)
 
             rows = await self._search_channel(
                 client=client,
@@ -463,7 +832,7 @@ class TelegramService:
         date_from=None,
         date_to=None,
         content_filter="all",
-        translate_search=False,
+        translate_languages=None,
     ):
         async with self.lock():
             client = await self._ensure_client()
@@ -472,7 +841,7 @@ class TelegramService:
             final_limit = max(1, min(int(limit), 1000))
             start_dt = parse_local_datetime(date_from)
             end_dt = parse_local_datetime(date_to, end_of_day=True)
-            terms, translated_terms, translation_warning = expand_search_terms(search, translate_search)
+            terms, translated_terms, translation_warning = expand_search_terms(search, translate_languages)
             offsets = parse_offset_state(offset_state)
 
             all_rows = []
@@ -580,15 +949,20 @@ class TelegramService:
             if target.exists() and target.stat().st_size > 0:
                 return {"path": str(target), "size": target.stat().st_size, "cached": True}
 
-            path = await client.download_media(message, file=str(target))
+            partial = target.with_suffix(target.suffix + ".part")
+            if partial.exists():
+                partial.unlink()
+            path = await client.download_media(message, file=str(partial))
             if not path:
                 raise RuntimeError("Telegram did not return a downloaded video file.")
             saved = Path(path).resolve()
-            return {"path": str(saved), "size": saved.stat().st_size if saved.exists() else None, "cached": False}
+            if not saved.exists() or saved.stat().st_size <= 0:
+                raise RuntimeError("Telegram did not return a downloaded video file.")
+            saved.replace(target)
+            return {"path": str(target), "size": target.stat().st_size if target.exists() else None, "cached": False}
 
 
-init_db()
-SERVICE = TelegramService()
+SERVICE = None
 
 
 def file_safe(value):
@@ -662,24 +1036,45 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(SERVICE.call(SERVICE.status()))
             if parsed.path == "/api/channels":
                 return self.json_response({"channels": configured_channels()})
+            if parsed.path == "/api/channel-groups":
+                return self.json_response({"groups": configured_channel_groups()})
             if parsed.path == "/api/settings":
                 return self.json_response({"download_dir": str(get_download_dir()), "db_path": str(DB_PATH.resolve())})
+            if parsed.path == "/favicon.ico":
+                self.send_response(204)
+                self.end_headers()
+                return
             if parsed.path == "/api/posts":
                 query = parse_qs(parsed.query)
                 channel = query.get("channel", ["TasnimNews"])[0]
-                if channel == "__all__":
+                group_name = None
+                if channel.startswith("__group__:"):
+                    group_id = channel.split(":", 1)[1]
+                    group_name, selected_channels = channels_for_group(group_id)
+                    if not selected_channels:
+                        raise ValueError("This monitoring list has no channels. Add at least one channel in Settings.")
+                else:
+                    selected_channels = configured_channels() if channel == "__all__" else None
+                if selected_channels is not None:
                     data = SERVICE.call(
                         SERVICE.posts_many(
-                            channels=configured_channels(),
+                            channels=selected_channels,
                             limit=query.get("limit", ["100"])[0],
                             search=query.get("search", [""])[0] or None,
                             offset_state=query.get("offset_state", [""])[0],
                             date_from=query.get("date_from", [""])[0] or None,
                             date_to=query.get("date_to", [""])[0] or None,
                             content_filter=query.get("content_filter", ["all"])[0],
-                            translate_search=truthy(query.get("translate_search", ["0"])[0]),
+                            translate_languages=(
+                                query.get("translate_languages", [""])[0]
+                                or ("fa" if truthy(query.get("translate_search", ["0"])[0]) else "")
+                            ),
                         )
                     )
+                    if group_name:
+                        data["channel"] = group_name
+                        data["group_name"] = group_name
+                        data["mode"] = "group"
                 else:
                     data = SERVICE.call(
                         SERVICE.posts(
@@ -690,7 +1085,10 @@ class Handler(BaseHTTPRequestHandler):
                             date_from=query.get("date_from", [""])[0] or None,
                             date_to=query.get("date_to", [""])[0] or None,
                             content_filter=query.get("content_filter", ["all"])[0],
-                            translate_search=truthy(query.get("translate_search", ["0"])[0]),
+                            translate_languages=(
+                                query.get("translate_languages", [""])[0]
+                                or ("fa" if truthy(query.get("translate_search", ["0"])[0]) else "")
+                            ),
                         )
                     )
                 return self.json_response(data)
@@ -702,6 +1100,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            if self.path == "/api/heartbeat":
+                global LAST_HEARTBEAT, HEARTBEAT_RECEIVED
+                LAST_HEARTBEAT = time.time()
+                HEARTBEAT_RECEIVED = True
+                return self.json_response({"status": "ok"})
+
             payload = self.read_json()
             if self.path == "/api/connect":
                 data = SERVICE.call(
@@ -713,8 +1117,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(data)
             if self.path == "/api/export":
                 return self.json_response(export_items(payload))
+            if self.path == "/api/translate-search":
+                return self.json_response(
+                    translate_result_search(payload.get("search"), payload.get("languages"))
+                )
             if self.path == "/api/download-video":
-                data = SERVICE.call(SERVICE.download_video(payload.get("channel"), payload.get("id")))
+                data = SERVICE.call(
+                    SERVICE.download_video(payload.get("channel"), payload.get("id")),
+                    timeout=DOWNLOAD_TIMEOUT,
+                )
                 return self.json_response(data)
             if self.path == "/api/settings":
                 return self.json_response(set_download_dir(payload.get("download_dir")))
@@ -722,6 +1133,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.json_response(pick_download_dir())
             if self.path == "/api/channels":
                 return self.json_response(set_channels(payload.get("channels") or []))
+            if self.path == "/api/channel-groups":
+                return self.json_response(set_channel_groups(payload.get("groups") or []))
             return self.json_response({"error": "not found"}, 404)
         except ApiIdInvalidError:
             return self.json_response(
@@ -769,10 +1182,35 @@ class Handler(BaseHTTPRequestHandler):
         print(fmt % args)
 
 
+def open_browser():
+    import time
+    time.sleep(0.5)
+    webbrowser.open(f"http://{HOST}:{PORT}")
+
+
 def main():
-    server = ThreadingHTTPServer((HOST, PORT), Handler)
+    global SERVICE
+    import sys
+    try:
+        server = ThreadingHTTPServer((HOST, PORT), Handler)
+    except OSError as e:
+        print(f"Error: Could not bind to port {PORT}. Is another instance running? {e}", file=sys.stderr)
+        sys.exit(1)
+
     print(f"Telegram UI running at http://{HOST}:{PORT}")
-    server.serve_forever()
+    SERVICE = TelegramService()
+
+    if AUTO_SHUTDOWN_ON_BROWSER_CLOSE:
+        threading.Thread(target=heartbeat_monitor, args=(server,), daemon=True).start()
+
+    threading.Thread(target=open_browser, daemon=True).start()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        SERVICE.close()
+        server.server_close()
 
 
 if __name__ == "__main__":

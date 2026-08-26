@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프론트엔드 UI 컴포넌트 도감 (Top 30 UI Terms)</title>
+  <meta name="description" content="웹 프론트엔드 개발자가 가장 자주 접하는 30가지 UI 용어의 정의와, HTML/CSS/JS로 구현된 대화형 실시간 예제 및 소스 코드를 한눈에 확인해 보세요.">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navbar -->
+    <header class="app-header">
+      <div class="logo-section">
+        <div class="logo-icon">UI</div>
+        <h2 class="logo-text">UI Glossary</h2>
+      </div>
+      <div class="header-controls">
+        <button id="theme-toggle-btn" class="btn-icon" title="다크/라이트 테마 변경" aria-label="Toggle theme">
+          <i data-lucide="sun"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar & Content Panel -->
+    <div class="app-main">
+      <!-- Left Navigation Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-search">
+          <i data-lucide="search"></i>
+          <input type="text" id="search-input" placeholder="컴포넌트 검색 (영문/한글)..." aria-label="Search components">
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- Category: Inputs -->
+          <div class="category-group" data-category="input">
+            <h4 class="category-title">Inputs & Forms (입력)</h4>
+            <ul class="term-list">
+              <li class="term-item" data-term="button"><a href="#term-button">Button <span class="term-num">01</span></a></li>
+              <li class="term-item" data-term="input"><a href="#term-input">Input <span class="term-num">02</span></a></li>
+              <li class="term-item" data-term="checkbox"><a href="#term-checkbox">Checkbox <span class="term-num">03</span></a></li>
+              <li class="term-item" data-term="radio"><a href="#term-radio">Radio Button <span class="term-num">04</span></a></li>
+              <li class="term-item" data-term="dropdown"><a href="#term-dropdown">Dropdown <span class="term-num">05</span></a></li>
+              <li class="term-item" data-term="select"><a href="#term-select">Select Box <span class="term-num">06</span></a></li>
+              <li class="term-item" data-term="slider"><a href="#term-slider">Slider <span class="term-num">26</span></a></li>
+              <li class="term-item" data-term="datepicker"><a href="#term-datepicker">Date Picker <span class="term-num">29</span></a></li>
+              <li class="term-item" data-term="fileupload"><a href="#term-fileupload">File Upload <span class="term-num">30</span></a></li>
+            </ul>
+          </div>
+
+          <!-- Category: Navigation -->
+          <div class="category-group" data-category="navigation">
+            <h4 class="category-title">Navigation (네비게이션)</h4>
+            <ul class="term-list">
+              <li class="term-item" data-term="pagination"><a href="#term-pagination">Pagination <span class="term-num">15</span></a></li>
+              <li class="term-item" data-term="tab"><a href="#term-tab">Tab <span class="term-num">16</span></a></li>
+              <li class="term-item" data-term="sidebar"><a href="#term-sidebar">Sidebar <span class="term-num">18</span></a></li>
+              <li class="term-item" data-term="navbar"><a href="#term-navbar">Navbar <span class="term-num">19</span></a></li>
+              <li class="term-item" data-term="breadcrumb"><a href="#term-breadcrumb">Breadcrumb <span class="term-num">21</span></a></li>
+            </ul>
+          </div>
+
+          <!-- Category: Data Display -->
+          <div class="category-group" data-category="display">
+            <h4 class="category-title">Data Display (데이터 표시)</h4>
+            <ul class="term-list">
+              <li class="term-item" data-term="card"><a href="#term-card">Card <span class="term-num">12</span></a></li>
+              <li class="term-item" data-term="table"><a href="#term-table">Table <span class="term-num">13</span></a></li>
+              <li class="term-item" data-term="datagrid"><a href="#term-datagrid">Data Grid <span class="term-num">14</span></a></li>
+              <li class="term-item" data-term="avatar"><a href="#term-avatar">Avatar <span class="term-num">22</span></a></li>
+              <li class="term-item" data-term="badge"><a href="#term-badge">Badge <span class="term-num">23</span></a></li>
+              <li class="term-item" data-term="chip"><a href="#term-chip">Chip <span class="term-num">24</span></a></li>
+              <li class="term-item" data-term="tag"><a href="#term-tag">Tag <span class="term-num">25</span></a></li>
+              <li class="term-item" data-term="progressbar"><a href="#term-progressbar">Progress Bar <span class="term-num">27</span></a></li>
+              <li class="term-item" data-term="skeleton"><a href="#term-skeleton">Skeleton <span class="term-num">28</span></a></li>
+            </ul>
+          </div>
+
+          <!-- Category: Overlay & Feedback -->
+          <div class="category-group" data-category="overlay">
+            <h4 class="category-title">Overlay & Feedback (피드백)</h4>
+            <ul class="term-list">
+              <li class="term-item" data-term="modal"><a href="#term-modal">Modal <span class="term-num">07</span></a></li>
+              <li class="term-item" data-term="dialog"><a href="#term-dialog">Dialog <span class="term-num">08</span></a></li>
+              <li class="term-item" data-term="toast"><a href="#term-toast">Toast <span class="term-num">09</span></a></li>
+              <li class="term-item" data-term="tooltip"><a href="#term-tooltip">Tooltip <span class="term-num">10</span></a></li>
+              <li class="term-item" data-term="popover"><a href="#term-popover">Popover <span class="term-num">11</span></a></li>
+              <li class="term-item" data-term="accordion"><a href="#term-accordion">Accordion <span class="term-num">17</span></a></li>
+              <li class="term-item" data-term="drawer"><a href="#term-drawer">Drawer <span class="term-num">20</span></a></li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Scrollable Content -->
+      <main class="app-content" id="scroll-container">
+        <section class="intro-section">
+          <h1>프론트엔드 핵심 UI 용어 TOP 30 도감</h1>
+          <p>프론트엔드 개발 시 자주 사용하는 핵심 UI 구성 요소의 정의, 활용 방법, 그리고 HTML/CSS/JS로 실제 구현된 인터랙티브 예제를 제공합니다.</p>
+        </section>
+
+        <div class="components-grid" id="components-grid">
+          
+          <!-- 01. BUTTON -->
+          <article class="component-card" id="term-button" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">01</span>
+                <h3 class="term-title">Button</h3>
+                <span class="category-badge">Input / Action</span>
+              </div>
+              <p class="term-korean">버튼</p>
+            </div>
+            <p class="term-desc">사용자가 클릭하여 액션(폼 제출, 모달 열기, 페이지 전환 등)을 유발하는 가장 대표적인 입력 컨트롤입니다. 호버, 액티브, 포커스, 비활성화(disabled), 로딩 중 상태 등을 세심하게 디자인해야 합니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-button">
+                <button class="btn btn-primary">Primary</button>
+                <button class="btn btn-secondary">Secondary</button>
+                <button class="btn btn-outline">Outline</button>
+                <button class="btn btn-danger">Danger</button>
+                <button class="btn btn-primary" disabled>Disabled</button>
+                <button class="btn btn-primary btn-loading"><span class="spinner"></span>로딩 중</button>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 02. INPUT -->
+          <article class="component-card" id="term-input" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">02</span>
+                <h3 class="term-title">Input</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">입력창</p>
+            </div>
+            <p class="term-desc">텍스트, 숫자, 비밀번호 등을 사용자로부터 직접 입력받는 창입니다. 라벨(Label), 플레이스홀더(Placeholder), 도움말 텍스트(Helper Text), 에러 상태에 따른 필드 변형 등이 고려되어야 합니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-input">
+                <div class="form-group" id="demo-form-group">
+                  <label class="form-label" for="demo-input-text">유저네임</label>
+                  <div class="input-wrapper input-with-icon">
+                    <i data-lucide="user"></i>
+                    <input type="text" id="demo-input-text" class="input-field" placeholder="유저네임을 입력하세요">
+                  </div>
+                  <span class="form-helper" id="demo-input-helper">영문 소문자, 숫자 조합 4~12자</span>
+                  <span class="form-error" id="demo-input-error">유효하지 않은 입력입니다.</span>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 03. CHECKBOX -->
+          <article class="component-card" id="term-checkbox" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">03</span>
+                <h3 class="term-title">Checkbox</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">체크박스</p>
+            </div>
+            <p class="term-desc">여러 옵션 목록 중에서 복수의 항목을 동시에 선택할 수 있도록 해주는 입력 필드입니다. 선택(Checked), 해제(Unchecked), 부분 선택(Indeterminate) 및 비활성화 상태를 표현할 수 있습니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-checkbox">
+                <div class="demo-row">
+                  <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" checked>
+                    <span class="checkbox-custom"></span>
+                    <span>HTML/CSS</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input">
+                    <span class="checkbox-custom"></span>
+                    <span>JavaScript</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" disabled>
+                    <span class="checkbox-custom"></span>
+                    <span>React (비활성)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 04. RADIO BUTTON -->
+          <article class="component-card" id="term-radio" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">04</span>
+                <h3 class="term-title">Radio Button</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">라디오 버튼</p>
+            </div>
+            <p class="term-desc">제시된 여러 옵션 중에서 오직 한 가지만 강제하여 선택할 수 있도록 해주는 UI 요소입니다. 동일한 `name` 어트리뷰트 속성으로 묶어 브라우저가 다중 선택을 배제하게 동작시킵니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-radio">
+                <div class="demo-row">
+                  <label class="radio-label">
+                    <input type="radio" name="level-choice" class="radio-input" checked>
+                    <span class="radio-custom"></span>
+                    <span>주니어</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="level-choice" class="radio-input">
+                    <span class="radio-custom"></span>
+                    <span>시니어</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="level-choice" class="radio-input">
+                    <span class="radio-custom"></span>
+                    <span>리드</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 05. DROPDOWN -->
+          <article class="component-card" id="term-dropdown" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">05</span>
+                <h3 class="term-title">Dropdown</h3>
+                <span class="category-badge">Navigation / Input</span>
+              </div>
+              <p class="term-korean">드롭다운</p>
+            </div>
+            <p class="term-desc">버튼이나 요소를 클릭했을 때, 숨겨져 있던 선택 목록이나 동작 리스트가 하단(또는 상단)에 펼쳐지는 메뉴식 UI 컴포넌트입니다. 외부 영역 클릭 시 닫히는 기능이 기본적으로 내장되어야 편리합니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-dropdown">
+                <div class="dropdown-wrapper" id="dropdown-example">
+                  <button class="btn btn-secondary dropdown-toggle" id="dropdown-toggle-btn">
+                    계정 관리 <i data-lucide="chevron-down" style="width: 1rem; height: 1rem; margin-left: 0.25rem;"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <div class="dropdown-item"><i data-lucide="user" style="width:0.875rem; height:0.875rem;"></i> 회원 정보</div>
+                    <div class="dropdown-item"><i data-lucide="settings" style="width:0.875rem; height:0.875rem;"></i> 환경 설정</div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" style="color: var(--danger);"><i data-lucide="log-out" style="width:0.875rem; height:0.875rem;"></i> 로그아웃</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 06. SELECT BOX -->
+          <article class="component-card" id="term-select" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">06</span>
+                <h3 class="term-title">Select Box</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">셀렉트 박스</p>
+            </div>
+            <p class="term-desc">미리 정의된 여러 항목 중에서 오직 하나의 옵션을 클릭해 선택할 때 사용하는 폼 컨트롤입니다. 브라우저의 기본 `<select>` 요소를 스타일링하거나, 드롭다운 형태의 커스텀 셀렉터로 대체합니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-select">
+                <div class="custom-select" id="custom-select-demo">
+                  <button class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="select-value">Gemini 3.5 Flash (High)</span>
+                    <i data-lucide="chevron-down" class="select-chevron"></i>
+                  </button>
+                  <div class="select-options-container">
+                    <div class="select-option selected" data-value="high">
+                      <span>Gemini 3.5 Flash (High)</span>
+                      <i data-lucide="check" class="select-check-icon"></i>
+                    </div>
+                    <div class="select-option" data-value="pro">
+                      <span>Gemini 1.5 Pro</span>
+                      <i data-lucide="check" class="select-check-icon"></i>
+                    </div>
+                    <div class="select-option" data-value="ultra">
+                      <span>Gemini Ultra</span>
+                      <i data-lucide="check" class="select-check-icon"></i>
+                    </div>
+                  </div>
+                  <input type="hidden" name="model-select" id="select-hidden-value" value="high">
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 07. MODAL -->
+          <article class="component-card" id="term-modal" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">07</span>
+                <h3 class="term-title">Modal</h3>
+                <span class="category-badge">Overlay</span>
+              </div>
+              <p class="term-korean">모달</p>
+            </div>
+            <p class="term-desc">기존 본문 화면 위에 레이어를 덮어 사용자 시선을 집중시키고 상호작용하게 만드는 창입니다. 사용자가 모달 창을 닫기 전까지는 기존 본문 콘텐츠와 상호작용하는 것이 전면 제어 차단됩니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-modal">
+                <button class="btn btn-primary" id="modal-trigger-btn">설정 변경</button>
+                <div class="modal-overlay-demo" id="modal-container-element">
+                  <div class="modal-content-demo">
+                    <div class="modal-header-demo">
+                      <h4>API 액세스 설정</h4>
+                      <button class="btn-icon" id="modal-close-icon-btn"><i data-lucide="x"></i></button>
+                    </div>
+                    <div class="modal-body-demo">
+                      <p>원격 서버 액세스를 위해 API Key 설정을 변경할까요? 이 작업은 보안 설정에 영향을 줄 수 있습니다. 신중하게 결정해 주세요.</p>
+                    </div>
+                    <div class="modal-footer-demo">
+                      <button class="btn btn-secondary" id="modal-cancel-element-btn">취소</button>
+                      <button class="btn btn-primary" id="modal-confirm-element-btn">적용하기</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 08. DIALOG -->
+          <article class="component-card" id="term-dialog" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">08</span>
+                <h3 class="term-title">Dialog</h3>
+                <span class="category-badge">Overlay</span>
+              </div>
+              <p class="term-korean">대화상자</p>
+            </div>
+            <p class="term-desc">모달의 일종으로, 보통 사용자에게 최종 승인이나 경고, 취소 등 명시적인 '결정'을 받아내기 위해 표시되는 메시지성 레이아웃 상자입니다. 긍정/부정 액션 버튼이 강조되어 배치됩니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-dialog">
+                <button class="btn btn-danger" id="dialog-trigger-btn">서버 인스턴스 정지</button>
+                <div class="dialog-overlay-demo" id="dialog-container-element">
+                  <div class="dialog-content-demo">
+                    <div class="dialog-icon-demo danger">
+                      <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <h4>정말로 인스턴스를 종료할까요?</h4>
+                    <p>인스턴스가 즉시 중단되며, 저장되지 않은 작업 데이터가 손실될 위험이 있습니다. 서비스의 다운타임이 발생할 수 있습니다.</p>
+                    <div class="dialog-footer-demo">
+                      <button class="btn btn-secondary" id="dialog-cancel-element-btn">취소</button>
+                      <button class="btn btn-danger" id="dialog-confirm-element-btn">종료 실행</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 09. TOAST -->
+          <article class="component-card" id="term-toast" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">09</span>
+                <h3 class="term-title">Toast</h3>
+                <span class="category-badge">Feedback / Notification</span>
+              </div>
+              <p class="term-korean">토스트 알림</p>
+            </div>
+            <p class="term-desc">화면 구석에 스르륵 나타났다가 수 초 이내에 자동으로 사라지는 작고 가벼운 알림 메시지입니다. 흐름을 방해하지 않고 백그라운드 작업 완료(저장됨, 성공 등) 피드백을 전달할 때 최고입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-toast">
+                <div class="demo-row">
+                  <button class="btn btn-success" id="toast-trigger-success">성공 토스트</button>
+                  <button class="btn btn-primary" id="toast-trigger-info">정보 토스트</button>
+                  <button class="btn btn-danger" id="toast-trigger-error">에러 토스트</button>
+                </div>
+                <!-- Toasts will be appended dynamically via JavaScript -->
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 10. TOOLTIP -->
+          <article class="component-card" id="term-tooltip" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">10</span>
+                <h3 class="term-title">Tooltip</h3>
+                <span class="category-badge">Overlay / Feedback</span>
+              </div>
+              <p class="term-korean">툴팁</p>
+            </div>
+            <p class="term-desc">해당 요소 위에 마우스 포인터를 올렸을 때(Hover), 해당 항목의 맥락에 맞춘 부가 설명 텍스트를 담아 조그맣게 띄워주는 미니 설명창입니다. 공간 절약과 쉬운 설명 제공에 유리합니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-tooltip">
+                <div class="tooltip-trigger">
+                  <button class="btn btn-secondary">저장하기</button>
+                  <div class="tooltip-box top">작업 내역이 로컬 클라우드 저장소에 임시 저장됩니다.</div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 11. POPOVER -->
+          <article class="component-card" id="term-popover" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">11</span>
+                <h3 class="term-title">Popover</h3>
+                <span class="category-badge">Overlay</span>
+              </div>
+              <p class="term-korean">팝오버</p>
+            </div>
+            <p class="term-desc">툴팁과 유사하지만, 주로 클릭 동작에 의해 켜지며 단순 설명 문장을 넘어 버튼, 입력 필드 등 복잡한 상호작용 요소를 직접 포함할 수 있는 리치 정보창 레이아웃입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-popover">
+                <div class="popover-wrapper" id="popover-example-wrapper">
+                  <button class="btn btn-secondary popover-toggle" id="popover-toggle-btn">
+                    토큰 가이드 <i data-lucide="help-circle" style="width:1rem; height:1rem; margin-left:0.25rem;"></i>
+                  </button>
+                  <div class="popover-box">
+                    <h5 class="popover-title">
+                      <i data-lucide="info" style="width:1rem; height:1rem; color:var(--primary);"></i> 토큰 갱신 안내
+                    </h5>
+                    <p class="popover-body">보안상 API 연결 유지 토큰은 24시간마다 정기적으로 자동 갱신됩니다. 만약 접속이 해제된다면 대시보드에서 키를 재발급하세요.</p>
+                    <div class="popover-arrow"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 12. CARD -->
+          <article class="component-card" id="term-card" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">12</span>
+                <h3 class="term-title">Card</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">카드</p>
+            </div>
+            <p class="term-desc">이미지, 타이틀, 키워드, 부가 설명 등 하나의 주제 아래 연관된 파편 정보들을 하나의 묶음 박스로 시각화하여 표현해 주는 레이아웃 컴포넌트입니다. 그리드 배치 구성과 연동되어 많이 활용됩니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-card">
+                <div class="card-demo">
+                  <div class="card-img-placeholder">
+                    <i data-lucide="image" style="width: 2.5rem; height: 2.5rem;"></i>
+                  </div>
+                  <div class="card-body-demo">
+                    <div class="card-tag-wrapper">
+                      <span class="tag-demo tag-indigo">React</span>
+                      <span class="tag-demo tag-emerald">Vite</span>
+                    </div>
+                    <h4 class="card-title-demo">빠른 시작 안내서</h4>
+                    <p class="card-text-demo">Vite 개발 빌드 환경을 이용해 초고속으로 리액트 환경 템플릿을 세팅하고 실행해 봅니다.</p>
+                    <div class="card-footer-demo">
+                      <span style="font-size:0.75rem; color:var(--text-muted);">2026.06.23</span>
+                      <button class="btn btn-primary" style="padding:0.25rem 0.5rem; font-size:0.75rem; border-radius:var(--radius-sm);">자세히</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 13. TABLE -->
+          <article class="component-card" id="term-table" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">13</span>
+                <h3 class="term-title">Table</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">테이블</p>
+            </div>
+            <p class="term-desc">행(Row)과 열(Column)의 격자 구조로 설계하여 대량의 텍스트 수치 정보를 체계적으로 목록화하여 표현해 주는 고전적이면서도 가독성 높은 표 형식의 화면 표시 컴포넌트입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-table">
+                <div class="table-container">
+                  <table class="table-demo">
+                    <thead>
+                      <tr>
+                        <th>라이브러리</th>
+                        <th>버전</th>
+                        <th>의존성</th>
+                        <th>다운로드수</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>React</td>
+                        <td>19.0.0</td>
+                        <td>None</td>
+                        <td>12M/week</td>
+                      </tr>
+                      <tr>
+                        <td>Next.js</td>
+                        <td>15.1.0</td>
+                        <td>React</td>
+                        <td>5.2M/week</td>
+                      </tr>
+                      <tr>
+                        <td>Zustand</td>
+                        <td>5.0.1</td>
+                        <td>None</td>
+                        <td>3.1M/week</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 14. DATA GRID -->
+          <article class="component-card" id="term-datagrid" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">14</span>
+                <h3 class="term-title">Data Grid</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">데이터 그리드</p>
+            </div>
+            <p class="term-desc">일반 정적 테이블에 한 단계 높은 제어 기능(헤더 정렬, 실시간 필터 검색, 선택 체크박스, 인라인 셀 수정, 무한 스크롤 연동 등)을 입혀 고도화한 고급 데이터 분석 테이블 컴포넌트입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-datagrid">
+                <div class="demo-box-center">
+                  <div class="datagrid-controls">
+                    <input type="text" id="grid-search-input" class="input-field datagrid-search" placeholder="개발자 이름 검색...">
+                    <div class="select-wrapper" style="max-width: 120px;">
+                      <select id="grid-status-filter" class="select-native" style="padding: 0.5rem 2rem 0.5rem 0.75rem;">
+                        <option value="ALL">전체</option>
+                        <option value="Active">활성</option>
+                        <option value="Suspended">정지</option>
+                      </select>
+                      <i data-lucide="chevron-down" style="right: 0.75rem;"></i>
+                    </div>
+                  </div>
+                  <div class="table-container">
+                    <table class="table-demo datagrid-table">
+                      <thead>
+                        <tr>
+                          <th class="sortable" id="sort-name-header">이름 <span class="sort-icon" id="sort-name-icon">↕</span></th>
+                          <th>역할</th>
+                          <th>상태</th>
+                        </tr>
+                      </thead>
+                      <tbody id="grid-data-body">
+                        <!-- Loaded dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 15. PAGINATION -->
+          <article class="component-card" id="term-pagination" data-category="navigation">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">15</span>
+                <h3 class="term-title">Pagination</h3>
+                <span class="category-badge">Navigation</span>
+              </div>
+              <p class="term-korean">페이지네이션</p>
+            </div>
+            <p class="term-desc">불러올 대량의 행 데이터를 청크(Chunk) 단위로 쪼개고, 여러 개 페이지 목록 번호를 매겨 선택 전환하며 이전/다음 버튼을 제공하는 네비게이션 제어 컨트롤러입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-pagination">
+                <div class="demo-box-center">
+                  <div id="paginator-status-label" style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.5rem;">현재 2 / 5 페이지</div>
+                  <div class="pagination-demo" id="pagination-control-box">
+                    <button class="page-btn" id="pag-btn-prev"><i data-lucide="chevron-left" style="width:1rem; height:1rem;"></i></button>
+                    <button class="page-btn" data-target-page="1">1</button>
+                    <button class="page-btn active" data-target-page="2">2</button>
+                    <button class="page-btn" data-target-page="3">3</button>
+                    <button class="page-btn" data-target-page="4">4</button>
+                    <button class="page-btn" data-target-page="5">5</button>
+                    <button class="page-btn" id="pag-btn-next"><i data-lucide="chevron-right" style="width:1rem; height:1rem;"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 16. TAB -->
+          <article class="component-card" id="term-tab" data-category="navigation">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">16</span>
+                <h3 class="term-title">Tab</h3>
+                <span class="category-badge">Navigation</span>
+              </div>
+              <p class="term-korean">탭</p>
+            </div>
+            <p class="term-desc">동일 레이아웃 컨테이너 영역 안에 묶인 서로 다른 카테고리 정보 페이지들을, 탭 상단 메뉴 버튼 헤더 클릭 시 즉시 스위칭하여 번갈아 표시해 주는 탭식 전환 컴포넌트입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-tab">
+                <div class="tab-container-demo" id="tab-demo-group">
+                  <div class="tabs-header-demo">
+                    <button class="tab-header-btn active" data-tab-panel="panel-profile">내 정보</button>
+                    <button class="tab-header-btn" data-tab-panel="panel-security">인증 설정</button>
+                  </div>
+                  <div class="tab-pane-demo active" id="panel-profile">
+                    <p>내 정보 탭: 프로필 명명 및 이메일을 검증하고 저장 관리할 수 있습니다.</p>
+                  </div>
+                  <div class="tab-pane-demo" id="panel-security">
+                    <p>인증 설정 탭: API 발급 키 관리 및 SSH 보안 프로필 설정을 지원합니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 17. ACCORDION -->
+          <article class="component-card" id="term-accordion" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">17</span>
+                <h3 class="term-title">Accordion</h3>
+                <span class="category-badge">Overlay / Structure</span>
+              </div>
+              <p class="term-korean">아코디언</p>
+            </div>
+            <p class="term-desc">클릭하면 숨겨져 있던 세부 설명 내용 판넬이 슬라이드 다운 형식으로 펼쳐지고, 다시 클릭하면 수직 크기가 0으로 접히는 아코디언 악기식 접이메뉴입니다. 자주 묻는 질문(FAQ)에 빈번히 쓰입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-accordion">
+                <div class="accordion-wrapper" id="faq-accordion">
+                  <div class="accordion-item">
+                    <button class="accordion-trigger">
+                      <span>결제 취소 승인 기간은 얼마나 걸리나요?</span>
+                      <i data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="accordion-panel">
+                      <div class="accordion-content-inner">
+                        취소 요청 접수 후 카드사 승인 취소까지 보통 업무일 기준 3~5일 정도 소요됩니다. 자세한 사항은 사용하시는 카드사에 접수 여부를 체크해 보세요.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <button class="accordion-trigger">
+                      <span>무료 플랜 만료 후 요금이 자동 충전되나요?</span>
+                      <i data-lucide="chevron-down"></i>
+                    </button>
+                    <div class="accordion-panel">
+                      <div class="accordion-content-inner">
+                        아니요. 무료 체험 기간 종료 시 자동으로 사용 정지 상태가 되며, 사용자의 명시적인 구독 카드 등록 결제 전까지 자동 충전되지 않습니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 18. SIDEBAR -->
+          <article class="component-card" id="term-sidebar" data-category="navigation">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">18</span>
+                <h3 class="term-title">Sidebar</h3>
+                <span class="category-badge">Navigation / Layout</span>
+              </div>
+              <p class="term-korean">사이드바</p>
+            </div>
+            <p class="term-desc">화면 좌측 또는 우측 가장자리에 부착되는 수직 형태의 탐색 패널입니다. 로고, 메뉴 아이콘, 세부 메뉴 목록 등을 수용하며 반응형 디바이스 화면에서는 숨겨지거나 좁게 접힙니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-sidebar">
+                <div class="sidebar-container-demo">
+                  <div class="sidebar-demo" id="demo-nav-sidebar">
+                    <div class="sidebar-demo-btn" id="demo-sidebar-toggle-action">
+                      <i data-lucide="menu"></i>
+                      <span class="sidebar-text">접기/열기</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="sidebar-demo-btn active">
+                      <i data-lucide="layout-dashboard"></i>
+                      <span class="sidebar-text">대시보드</span>
+                    </div>
+                    <div class="sidebar-demo-btn">
+                      <i data-lucide="settings"></i>
+                      <span class="sidebar-text">설정</span>
+                    </div>
+                  </div>
+                  <div class="sidebar-content-demo">
+                    <h5 style="margin-bottom:0.5rem; font-weight:700;">사이드바 수축 제어</h5>
+                    <p style="font-size:0.75rem; color:var(--text-secondary);">좌측 햄버거 탭 버튼을 클릭하여 수평 바 가로폭 축소/팽창 트랜지션 애니메이션을 연출해 봅니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 19. NAVBAR -->
+          <article class="component-card" id="term-navbar" data-category="navigation">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">19</span>
+                <h3 class="term-title">Navbar</h3>
+                <span class="category-badge">Navigation / Layout</span>
+              </div>
+              <p class="term-korean">네비게이션 바</p>
+            </div>
+            <p class="term-desc">헤더 영역 상단에 수평으로 구성되는 대표적인 네비게이션 가이드 바입니다. 브랜드 로고, 핵심 상위 메뉴, 글로벌 검색 및 로그인 상태 컨트롤 등이 일렬 배치됩니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-navbar">
+                <nav class="navbar-demo">
+                  <div class="navbar-brand-demo">Antigravity</div>
+                  <ul class="navbar-links-demo">
+                    <li class="navbar-link-demo"><a href="#">프로덕트</a></li>
+                    <li class="navbar-link-demo"><a href="#">가격</a></li>
+                  </ul>
+                  <button class="btn btn-primary" style="padding:0.35rem 0.625rem; font-size:0.75rem;">로그인</button>
+                </nav>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 20. DRAWER -->
+          <article class="component-card" id="term-drawer" data-category="overlay">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">20</span>
+                <h3 class="term-title">Drawer</h3>
+                <span class="category-badge">Overlay</span>
+              </div>
+              <p class="term-korean">서랍장 메뉴</p>
+            </div>
+            <p class="term-desc">트리거 버튼 클릭 시 화면 오른쪽 또는 왼쪽 가장자리에서 서랍장처럼 미끄러지듯 스르륵(Slide-in) 밀려나와 표시되는 오프캔버스(Off-canvas) 수직 레이아웃 패널입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-drawer">
+                <button class="btn btn-primary" id="drawer-trigger-btn">알림 히스토리 열기</button>
+                <div class="drawer-overlay-demo" id="drawer-container-element">
+                  <div class="drawer-content-demo">
+                    <div class="drawer-header-demo">
+                      <h4>활동 로그 알림</h4>
+                      <button class="btn-icon" id="drawer-close-icon-btn"><i data-lucide="x"></i></button>
+                    </div>
+                    <ul style="list-style:none; font-size:0.8125rem; display:flex; flex-direction:column; gap:0.75rem;">
+                      <li style="border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">
+                        <span class="tag-demo tag-indigo">Info</span> 빌드 태스크 스케줄 시작됨.
+                      </li>
+                      <li style="border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">
+                        <span class="tag-demo tag-emerald">Success</span> CSS 번들 경량화 컴파일 성공
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 21. BREADCRUMB -->
+          <article class="component-card" id="term-breadcrumb" data-category="navigation">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">21</span>
+                <h3 class="term-title">Breadcrumb</h3>
+                <span class="category-badge">Navigation</span>
+              </div>
+              <p class="term-korean">브레드크럼</p>
+            </div>
+            <p class="term-desc">헨젤과 그레텔의 '빵부스러기' 유래처럼, 현재 방문 중인 페이지 경로 상위 뎁스(Depth) 계층 구조 순서를 텍스트 체인 형식으로 조열해 보여주어 되돌아가기를 돕는 네비게이션 가이드입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-breadcrumb">
+                <div class="breadcrumb-demo">
+                  <div class="breadcrumb-item-demo"><a href="#">프로젝트</a></div>
+                  <i data-lucide="chevron-right" style="width:0.75rem; height:0.75rem;"></i>
+                  <div class="breadcrumb-item-demo"><a href="#">프론트엔드</a></div>
+                  <i data-lucide="chevron-right" style="width:0.75rem; height:0.75rem;"></i>
+                  <div class="breadcrumb-item-demo active">설정</div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 22. AVATAR -->
+          <article class="component-card" id="term-avatar" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">22</span>
+                <h3 class="term-title">Avatar</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">아바타</p>
+            </div>
+            <p class="term-desc">사용자 프로필 이미지나 이니셜 문구를 둥근 원형 마스크 안에 깔끔히 가둬 보여주는 얼굴 표시기입니다. 접속 유무 상태를 뜻하는 오버레이 도트나 그룹별 스택 구조로 확장될 수 있습니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-avatar">
+                <div class="demo-row">
+                  <div class="avatar-demo">
+                    <div class="avatar-img-demo">KB</div>
+                    <span class="avatar-badge-demo online"></span>
+                  </div>
+                  <div class="avatar-demo">
+                    <div class="avatar-img-demo" style="background-color: var(--success-light); color: var(--success);">AG</div>
+                    <span class="avatar-badge-demo offline"></span>
+                  </div>
+                  <div class="avatar-group-demo">
+                    <div class="avatar-demo"><div class="avatar-img-demo">A</div></div>
+                    <div class="avatar-demo"><div class="avatar-img-demo" style="background-color: var(--success-light); color: var(--success);">B</div></div>
+                    <div class="avatar-demo"><div class="avatar-img-demo" style="background-color: var(--warning-light); color: var(--warning);">C</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 23. BADGE -->
+          <article class="component-card" id="term-badge" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">23</span>
+                <h3 class="term-title">Badge</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">배지</p>
+            </div>
+            <p class="term-desc">특정 요소 우상단에 작게 오버레이되어 새로운 알림 숫자 카운트나 뉴(NEW) 표시, 혹은 특정 경고 상태를 강렬한 색조로 작게 돋보여주는 마이크로 알림 패널입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-badge">
+                <div class="demo-row">
+                  <div class="badge-demo-container">
+                    <button class="btn btn-secondary"><i data-lucide="bell" style="width:1.125rem; height:1.125rem;"></i></button>
+                    <span class="badge-demo">9</span>
+                  </div>
+                  <div class="badge-demo-container">
+                    <button class="btn btn-secondary"><i data-lucide="mail" style="width:1.125rem; height:1.125rem;"></i></button>
+                    <span class="badge-demo badge-dot"></span>
+                  </div>
+                  <button class="btn btn-secondary">
+                    버전 업데이트 <span class="badge-demo badge-inline" style="background-color: var(--primary);">NEW</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 24. CHIP -->
+          <article class="component-card" id="term-chip" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">24</span>
+                <h3 class="term-title">Chip</h3>
+                <span class="category-badge">Data Display / Input</span>
+              </div>
+              <p class="term-korean">칩</p>
+            </div>
+            <p class="term-desc">선택된 여러 세부 필터 조건, 태그 키워드, 속성 선택 등의 결과물들을 둥근 알약 모양 캡슐 단추 형태로 묶어 나열하고, 개별 삭제(X) 클릭 인터랙션을 부여한 콤팩트 제어 버튼입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-chip">
+                <div class="demo-row" id="chip-demo-group-container">
+                  <div class="chip-demo"><span>디자인</span><i data-lucide="x" class="chip-remove-trigger"></i></div>
+                  <div class="chip-demo"><span>엔지니어링</span><i data-lucide="x" class="chip-remove-trigger"></i></div>
+                  <button class="btn btn-outline" id="chip-add-action-btn" style="padding:0.2rem 0.5rem; font-size:0.75rem; border-radius:var(--radius-full);">+ 추가</button>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 25. TAG -->
+          <article class="component-card" id="term-tag" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">25</span>
+                <h3 class="term-title">Tag</h3>
+                <span class="category-badge">Data Display</span>
+              </div>
+              <p class="term-korean">태그</p>
+            </div>
+            <p class="term-desc">칩과 유사하지만 칩이 사용자가 선택하고 삭제하는 입력 요소의 성격이 강하다면, 태그는 정보의 특정 범주/메타 카테고리를 색상별로 구분해 읽기 전용 라벨로 표기해주는 수동적 인디케이터입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-tag">
+                <div class="demo-row">
+                  <span class="tag-demo tag-indigo">공지사항</span>
+                  <span class="tag-demo tag-emerald">성공</span>
+                  <span class="tag-demo tag-amber">대기 중</span>
+                  <span class="tag-demo tag-rose">오류</span>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 26. SLIDER -->
+          <article class="component-card" id="term-slider" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">26</span>
+                <h3 class="term-title">Slider</h3>
+                <span class="category-badge">Input / Control</span>
+              </div>
+              <p class="term-korean">슬라이더</p>
+            </div>
+            <p class="term-desc">정해진 수치 범위 안에서 조절 손잡이(Thumb)를 막대기 트랙(Track) 위에서 마우스 드래그나 터치 스와이프로 부드럽게 왕복 조율하며 값을 미세하고 즉각적으로 입력 조정하는 인터랙션 부품입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-slider">
+                <div class="slider-container-demo">
+                  <div class="slider-value">음량 볼륨 설정: <span id="slider-val-preview">60</span>%</div>
+                  <input type="range" class="slider-demo" id="demo-slider-bar" min="0" max="100" value="60">
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 27. PROGRESS BAR -->
+          <article class="component-card" id="term-progressbar" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">27</span>
+                <h3 class="term-title">Progress Bar</h3>
+                <span class="category-badge">Data Display / Feedback</span>
+              </div>
+              <p class="term-korean">진행 상태 바</p>
+            </div>
+            <p class="term-desc">백그라운드 파일 전송, 로딩 태스크 등 장시간 걸리는 비동기 작업의 누적 완성도를 0%부터 100%까지 채워나가는 막대기 형태의 프로세스 피드백 수치 지표입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-progressbar">
+                <div class="progress-container-demo">
+                  <div style="display:flex; justify-content:space-between; font-size:0.8125rem;">
+                    <span>다운로드 진행률</span>
+                    <span id="progressbar-percentage-label">40%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" id="progressbar-fill-indicator" style="width: 40%;"></div>
+                  </div>
+                  <button class="btn btn-secondary" id="progressbar-simulate-btn" style="padding:0.35rem; font-size:0.75rem; margin-top:0.25rem;">시작 / 시뮬레이션</button>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 28. SKELETON -->
+          <article class="component-card" id="term-skeleton" data-category="display">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">28</span>
+                <h3 class="term-title">Skeleton</h3>
+                <span class="category-badge">Data Display / Feedback</span>
+              </div>
+              <p class="term-korean">스켈레톤 로더</p>
+            </div>
+            <p class="term-desc">네트워크 API 데이터가 넘어오는 대기 시간 도중에, 빈 껍데기 레이아웃 뼈대 모형(회색 블록들)을 빛나며 지나가는 흐름 애니메이션으로 렌더링해 보여주어 체감 대기 속도를 가속시키는 로딩 지표입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-skeleton">
+                <div class="demo-box-center">
+                  <button class="btn btn-secondary" id="skeleton-toggle-btn" style="padding:0.35rem 0.75rem; font-size:0.75rem; margin-bottom:0.75rem;">데이터 로드 완료/로딩 상태 스위칭</button>
+                  
+                  <!-- Loaded Card (Initially Hidden) -->
+                  <div class="card-demo" id="skeleton-real-card-element" style="display:none; width:240px; margin:0;">
+                    <div class="card-img-placeholder" style="height:100px; font-size:0.8rem;">
+                      로딩된 이미지
+                    </div>
+                    <div class="card-body-demo" style="padding:0.75rem;">
+                      <h5 style="margin-bottom:0.25rem; font-weight:700;">프론트엔드 최적화</h5>
+                      <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">웹 로딩 체감 성능을 향상하는 기법</p>
+                      <span class="tag-demo tag-indigo" style="font-size:0.65rem;">성능 최적화</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Skeleton Loading Card -->
+                  <div class="skeleton-card" id="skeleton-placeholder-element">
+                    <div class="skeleton-item" style="height:100px; margin-bottom:0.75rem;"></div>
+                    <div class="skeleton-item skeleton-title"></div>
+                    <div class="skeleton-item skeleton-text"></div>
+                    <div class="skeleton-item skeleton-text short"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 29. DATE PICKER -->
+          <article class="component-card" id="term-datepicker" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">29</span>
+                <h3 class="term-title">Date Picker</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">날짜 선택기</p>
+            </div>
+            <p class="term-desc">텍스트 타자로 직접 날짜를 기입하기 어려운 실수를 방지하고자, 미니 달력 달력 격자를 화면 위에 팝업 띄워 연/월/일을 클릭해 기입하게 만들어주는 날짜 입력 도구입니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-datepicker">
+                <div class="demo-box-center">
+                  <input type="date" class="datepicker-demo" id="datepicker-element-input" value="2026-06-23">
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 30. FILE UPLOAD -->
+          <article class="component-card" id="term-fileupload" data-category="input">
+            <div class="card-header">
+              <div class="term-title-wrapper">
+                <span class="term-number">30</span>
+                <h3 class="term-title">File Upload</h3>
+                <span class="category-badge">Input / Form</span>
+              </div>
+              <p class="term-korean">파일 업로드</p>
+            </div>
+            <p class="term-desc">로컬 기기의 미디어 파일, 이미지 등을 골라 서버 저장소로 전달하기 위한 전송 영역입니다. 드래그앤드롭(Drag-and-Drop) 영역과 업로드 대기열 현황 조회를 함께 갖추는 것이 권장됩니다.</p>
+            <div class="demo-section">
+              <h4 class="section-title">실시간 예제 (Live Demo)</h4>
+              <div class="demo-box" id="demo-fileupload">
+                <div class="demo-box-center">
+                  <div class="upload-dropzone" id="dropzone-area-box">
+                    <i data-lucide="upload-cloud"></i>
+                    <p class="upload-text">드래그 앤 드롭 또는 <span>여기를 클릭</span></p>
+                    <input type="file" id="dropzone-native-input" style="display:none;" multiple>
+                  </div>
+                  <div class="upload-file-list" id="uploaded-files-display-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="code-section">
+              <button class="code-toggle-btn"><i data-lucide="chevron-right"></i> 코드 보기</button>
+              <div class="code-viewer-wrapper">
+                <div class="tabs-nav">
+                  <button class="tab-btn active" data-tab="html">HTML</button>
+                  <button class="tab-btn" data-tab="css">CSS</button>
+                  <button class="tab-btn" data-tab="js">JavaScript</button>
+                </div>
+                <div class="tab-content html-content active"><pre><code class="language-html"></code></pre></div>
+                <div class="tab-content css-content"><pre><code class="language-css"></code></pre></div>
+                <div class="tab-content js-content"><pre><code class="language-js"></code></pre></div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Shared Toast Container for active Toasts -->
+  <div class="toast-container" id="global-toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

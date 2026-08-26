@@ -4,16 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Telegram Channel Reader</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=20260826-multilang-search">
 </head>
 <body>
   <main class="shell">
-    <section class="topbar">
+    <section class="topbar heroPanel">
       <div>
-        <h1>Telegram Channel Reader</h1>
-        <p id="statusText">Checking session...</p>
+        <p class="eyebrow">AI News Monitoring Desk</p>
+        <h1>Telegram Intelligence Reader</h1>
+        <p class="heroCopy">저장된 텔레그램 뉴스 채널을 한 번에 검색하고, 기사 검토용 자료로 바로 저장합니다.</p>
+        <p id="statusText" class="statusPill">Checking session...</p>
       </div>
       <button id="refreshStatus" class="iconButton" title="상태 새로고침">↻</button>
+    </section>
+
+    <section class="insightGrid" aria-label="주요 작업 바로가기">
+      <div class="insightCard accentBlue">
+        <span>기본 조회</span>
+        <strong>All saved channels</strong>
+        <small>앱 시작 시 전체 저장 채널을 우선 확인</small>
+      </div>
+      <div class="insightCard accentGreen">
+        <span>검색 필터</span>
+        <strong>키워드 · 날짜 · 미디어</strong>
+        <small>뉴스 이슈별로 빠르게 좁혀 보기</small>
+      </div>
+      <div class="insightCard accentPurple">
+        <span>자료화</span>
+        <strong>Markdown · Video</strong>
+        <small>AI 요약과 기사 준비에 바로 활용</small>
+      </div>
     </section>
 
     <section class="panel" id="authPanel">
@@ -75,60 +95,97 @@
           <div id="channelRows" class="channelRows"></div>
           <button id="saveChannelsBtn">Save Channels</button>
         </div>
-      </div>
-    </section>
-
-    <section class="panel controls">
-      <div class="row">
-        <label class="channelSelectField">
-          <span>Saved channels</span>
-          <select id="channelSelect"></select>
-        </label>
-        <label class="channelField">
-          <span>Channel</span>
-          <input id="channel" value="TasnimNews" autocomplete="off">
-        </label>
-        <label class="limitField">
-          <span>Limit</span>
-          <input id="limit" type="number" min="1" max="1000" value="100">
-        </label>
-      </div>
-      <div class="row">
-        <div class="searchField">
-          <span class="fieldLabel">Search terms</span>
-          <textarea id="search" autocomplete="off" placeholder="비워두면 최신 포스팅 목록&#10;여러 키워드는 줄바꿈 또는 쉼표로 입력"></textarea>
-          <label class="checkLabel searchTranslateLabel">
-            <input id="translatePersian" type="checkbox">
-            <span>Translate search to Persian</span>
-          </label>
+        <div class="groupSettingsRow">
+          <div class="channelSettingsHeader">
+            <div>
+              <span>모니터링 목록</span>
+              <p>국가·지역·취재 이슈별로 채널을 묶습니다. 한 채널은 여러 목록에 넣을 수 있습니다.</p>
+            </div>
+            <button id="addGroupBtn" type="button">+ 새 목록</button>
+          </div>
+          <div id="groupRows" class="groupRows"></div>
+          <button id="saveGroupsBtn" type="button">모니터링 목록 저장</button>
+          <p id="groupHint" class="settingsHint"></p>
         </div>
-        <button id="loadBtn">Load Posts</button>
-      </div>
-      <div class="row dateRow">
-        <label>
-          <span>Date from</span>
-          <input id="dateFrom" type="datetime-local">
-        </label>
-        <label>
-          <span>Date to</span>
-          <input id="dateTo" type="datetime-local">
-        </label>
-      </div>
-      <div class="optionRow">
-        <label class="selectLabel">
-          <span>Content</span>
-          <select id="contentFilter">
-            <option value="all" selected>All posts</option>
-            <option value="with_media">Posts with media</option>
-            <option value="with_photo">Posts with photo</option>
-            <option value="with_video">Posts with video</option>
-          </select>
-        </label>
       </div>
     </section>
 
-    <section class="listHeader">
+    <section class="panel controls searchPanel">
+      <div class="panelHeader searchHeader">
+        <div>
+          <p class="eyebrow">Search Console</p>
+          <h2>채널 게시글 검색</h2>
+          <p>검색어를 비우면 최신 글을 불러옵니다. 여러 키워드는 줄바꿈 또는 쉼표로 입력합니다.</p>
+        </div>
+      </div>
+      <label class="searchTargetField">
+        <span>어디에서 찾을까요?</span>
+        <select id="channelSelect"></select>
+      </label>
+
+      <div class="mainSearchRow">
+        <div class="searchField">
+          <span class="fieldLabel">검색어</span>
+          <textarea id="search" autocomplete="off" placeholder="검색어를 입력하세요. 비워두면 최신 글을 보여줍니다."></textarea>
+          <div class="translationOptions searchTranslateLabel" aria-label="검색어 변환 언어">
+            <span class="translationOptionsTitle">검색어 변환</span>
+            <label><input class="searchLanguage" type="checkbox" value="fa"><span>페르시아어</span></label>
+            <label><input class="searchLanguage" type="checkbox" value="ru"><span>러시아어</span></label>
+            <label><input class="searchLanguage" type="checkbox" value="zh-CN"><span>중국어</span></label>
+            <label><input class="searchLanguage" type="checkbox" value="en"><span>영어</span></label>
+          </div>
+        </div>
+        <button id="loadBtn" type="button" class="primaryAction">검색</button>
+      </div>
+
+      <div class="quickFilterRow" aria-label="빠른 기간 선택">
+        <span class="quickFilterLabel">기간</span>
+        <button type="button" class="datePreset active" data-date-range="all">전체</button>
+        <button type="button" class="datePreset" data-date-range="today">오늘</button>
+        <button type="button" class="datePreset" data-date-range="3days">최근 3일</button>
+        <button type="button" class="datePreset" data-date-range="7days">최근 7일</button>
+      </div>
+
+      <details id="advancedFilters" class="advancedFilters">
+        <summary>
+          <span>상세 조건</span>
+          <small>날짜·미디어·게시글 수</small>
+        </summary>
+        <div class="advancedFilterBody">
+          <label id="directChannelField" class="directChannelField" hidden>
+            <span>채널 주소 직접 입력</span>
+            <input id="channel" value="TasnimNews" autocomplete="off" placeholder="예: TasnimNews">
+          </label>
+          <div class="advancedFilterGrid">
+            <label>
+              <span>시작 날짜와 시간</span>
+              <input id="dateFrom" type="datetime-local">
+            </label>
+            <label>
+              <span>종료 날짜와 시간</span>
+              <input id="dateTo" type="datetime-local">
+            </label>
+            <label>
+              <span>게시글 종류</span>
+              <select id="contentFilter">
+                <option value="all" selected>전체 글</option>
+                <option value="with_media">미디어가 있는 글</option>
+                <option value="with_photo">사진이 있는 글</option>
+                <option value="with_video">영상이 있는 글</option>
+              </select>
+            </label>
+            <label>
+              <span>불러올 게시글 수</span>
+              <input id="limit" type="number" min="1" max="1000" value="100">
+            </label>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="listHeader resultHeader">
       <div>
+        <p class="eyebrow">Live Feed</p>
         <h2 id="resultTitle">Posts</h2>
         <p id="resultMeta">No data loaded.</p>
       </div>
@@ -138,8 +195,24 @@
       </div>
     </section>
 
+    <section class="resultSearchBar" aria-label="결과 내 검색">
+      <label>
+        <span>결과 내 검색</span>
+        <input id="resultSearch" type="search" autocomplete="off" placeholder="불러온 게시글의 본문이나 채널명에서 찾기" disabled>
+      </label>
+      <button id="clearResultSearch" type="button" class="secondaryButton" disabled>지우기</button>
+      <div class="translationOptions resultTranslationOptions" aria-label="결과 검색어 변환 언어">
+        <span class="translationOptionsTitle">검색어 변환</span>
+        <label><input class="resultLanguage" type="checkbox" value="fa"><span>페르시아어</span></label>
+        <label><input class="resultLanguage" type="checkbox" value="ru"><span>러시아어</span></label>
+        <label><input class="resultLanguage" type="checkbox" value="zh-CN"><span>중국어</span></label>
+        <label><input class="resultLanguage" type="checkbox" value="en"><span>영어</span></label>
+      </div>
+      <p id="resultSearchCount">게시글을 불러오면 사용할 수 있습니다.</p>
+    </section>
+
     <section id="posts" class="posts"></section>
   </main>
-  <script src="/app.js?v=20260603-video-download"></script>
+  <script src="/app.js?v=20260826-multilang-search"></script>
 </body>
 </html>

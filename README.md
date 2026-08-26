@@ -38,7 +38,9 @@ Or copy `.env.example` to `.env` and edit the values manually.
 - `TELE_DB_PATH`: local SQLite settings DB path
 - `TELE_UI_PORT`: local web UI port, default `8788`
 - `TELE_REQUEST_TIMEOUT`: Telegram request timeout in seconds, default `120`
+- `TELE_DOWNLOAD_TIMEOUT`: video download timeout in seconds, default `3600`
 - `TELE_TRANSLATE_TIMEOUT`: Persian translation request timeout in seconds, default `6`
+- `TELE_AUTO_SHUTDOWN_ON_BROWSER_CLOSE`: set to `1` to stop the server when browser heartbeats stop; default is off.
 
 ## Run
 

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Telegram Channel Reader 사용자 매뉴얼</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333333;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      font-size: 2.2em;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 10px;
+      color: #1e3a8a;
+    }
+    h2 {
+      font-size: 1.6em;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h3 {
+      font-size: 1.2em;
+      color: #2563eb;
+      margin-top: 24px;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+      color: #d97706;
+    }
+    pre {
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: monospace;
+    }
+    .alert-box {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .alert-box strong {
+      color: #1e40af;
+    }
+    .warning-box {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .warning-box strong {
+      color: #b45309;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f9fafb;
+      font-weight: bold;
+    }
+    ul, ol {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Telegram Channel Reader 사용자 매뉴얼</h1>
+  <p>이 문서는 <strong>Telegram Channel Reader (텔레그램 채널 리더)</strong> 프로그램을 처음 접하는 일반 사용자를 위한 상세 가이드입니다.</p>
+
+  <h2>목차</h2>
+  <ol>
+    <li>프로그램 소개</li>
+    <li>사전 준비: 텔레그램 API 키 발급 절차</li>
+    <li>프로그램 설치 및 실행 방법</li>
+    <li>최초 로그인 및 인증 연동</li>
+    <li>주요 기능 사용법</li>
+    <li>자주 묻는 질문 (FAQ) 및 트러블슈팅</li>
+  </ol>
+
+  <h2>1. 프로그램 소개</h2>
+  <p><strong>Telegram Channel Reader</strong>는 사용자가 구독 중이거나 관심 있는 텔레그램 공개 채널의 포스팅을 가져와 편리하게 읽고 검색하며, 로컬 폴더에 저장할 수 있도록 돕는 독립형 데스크톱 웹 애플리케이션입니다.</p>
+  <ul>
+    <li><strong>무설정 구동</strong>: 별도의 파이썬(Python) 엔진 설치 없이 실행 파일(<code>app.exe</code>) 더블클릭만으로 즉시 구동됩니다.</li>
+    <li><strong>로컬 데이터 보존</strong>: 사용자의 API 키와 텔레그램 세션 정보는 사용자의 개인 PC 외부로 절대 유출되지 않고 로컬 DB에 안전하게 암호화되어 저장됩니다.</li>
+  </ul>
+
+  <h2>2. 사전 준비: 텔레그램 API 키 발급 절차 (최초 1회)</h2>
+  <p>텔레그램 서버는 보안을 위해 타사 앱을 통한 접속 시 고유한 개발자 API 키를 요구합니다. 아래 순서대로 쉽게 발급받을 수 있습니다.</p>
+  <ol>
+    <li><strong>로그인 사이트 접속</strong>
+      <ul>
+        <li>웹 브라우저를 열고 <a href="https://my.telegram.org" target="_blank">https://my.telegram.org</a>에 접속합니다.</li>
+      </ul>
+    </li>
+    <li><strong>전화번호 로그인</strong>
+      <ul>
+        <li><strong>Your Phone Number</strong> 칸에 국가코드를 포함한 본인의 텔레그램 가입 전화번호를 입력합니다. (예: 대한민국 국가코드 <code>+82</code>를 포함해 <code>+821012345678</code> 입력)</li>
+        <li><strong>Next</strong>를 누르면, 본인의 스마트폰/PC <strong>텔레그램 공식 앱</strong>으로 로그인 인증 코드가 전송됩니다.</li>
+        <li>전송받은 코드를 웹 화면의 <strong>Confirmation code</strong> 칸에 입력하고 <strong>Sign In</strong>을 클릭합니다.</li>
+      </ul>
+    </li>
+    <li><strong>앱 개발 도구 페이지로 이동</strong>
+      <ul>
+        <li>로그인 후 나타나는 메뉴 중 <strong>API development tools</strong>를 클릭합니다.</li>
+      </ul>
+    </li>
+    <li><strong>App 키 생성 신청</strong>
+      <ul>
+        <li>아래 공란들을 작성합니다. (임의의 영문 문자열을 작성해도 상관없습니다.)
+          <ul>
+            <li><strong>App title</strong>: 프로그램 이름 (예: <code>MyTelegramReader</code>)</li>
+            <li><strong>App short name</strong>: 짧은 이름 (예: <code>myreader</code>)</li>
+          </ul>
+        </li>
+        <li>작성 완료 후 하단의 <strong>Create application</strong> 버튼을 누릅니다.</li>
+      </ul>
+    </li>
+    <li><strong>API ID 및 API Hash 복사</strong>
+      <ul>
+        <li>성공적으로 생성되면 노란색 박스 안에 다음과 같은 두 개의 정보가 나타납니다.
+          <ul>
+            <li><strong>App api_id</strong>: 8자리 내외의 숫자 (예: <code>12345678</code>)</li>
+            <li><strong>App api_hash</strong>: 32자리의 영문/숫자 혼합 값 (예: <code>a1b2c3d4e5f6g7h8...</code>)</li>
+          </ul>
+        </li>
+        <li>이 두 값을 메모장 등에 안전하게 복사해 둡니다.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2>3. 프로그램 설치 및 실행 방법</h2>
+  <ol>
+    <li><strong>파일 다운로드</strong>
+      <ul>
+        <li>전달받은 <strong><code>app.exe</code></strong> 파일을 본인이 사용하기 편리한 폴더(예: <code>C:\TelegramReader</code> 등)에 넣어둡니다.</li>
+      </ul>
+    </li>
+    <li><strong>바탕화면에 바로가기 만들기</strong>
+      <ul>
+        <li>매번 폴더를 찾아가기 번거롭다면, <code>app.exe</code> 파일 위에 마우스 커서를 올리고 <strong>마우스 우클릭</strong>을 합니다.</li>
+        <li>나타난 메뉴에서 <strong>[보내기] ➡️ [바탕 화면에 바로 가기 만들기]</strong>를 클릭합니다. (윈도우 11의 경우, 우클릭 후 <code>추가 옵션 표시</code>를 눌러야 <code>보내기</code>가 보일 수 있습니다.)</li>
+        <li>바탕화면에 새로 만들어진 아이콘의 이름을 원하는 대로(예: <code>텔레그램 채널 검색기</code>) 수정하여 사용합니다.</li>
+      </ul>
+    </li>
+    <li><strong>프로그램 실행</strong>
+      <ul>
+        <li>바탕화면에 만든 바로가기 아이콘을 더블클릭합니다.</li>
+      </ul>
+    </li>
+    <li><strong>웹 화면 자동 오픈</strong>
+      <ul>
+        <li>실행 후 검은색 터미널(콘솔) 창이 뜨고, 곧이어 **구글 크롬(Chrome) 브라우저**가 자동으로 실행되며 프로그램 메인 화면(<code>http://127.0.0.1:8788</code>)이 나타납니다.</li>
+      </ul>
+    </li>
+    <li><strong>프로그램 종료 (자동 종료 기능)</strong>
+      <ul>
+        <li>작업을 마친 뒤 **크롬 브라우저의 텔레그램 화면(탭)을 그냥 닫으시면 됩니다.**</li>
+        <li>탭이 닫히면 서버가 이를 감지하고 약 30초 후에 백그라운드 콘솔 창을 **자동으로 종료**합니다.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="warning-box">
+    <strong>⚠️ Windows SmartScreen 경고 대처법</strong><br>
+    프로그램 실행 시 윈도우에서 "Windows의 PC 보호" 경고 팝업이 뜨는 경우가 있습니다. 이는 새로 제작된 개인 실행 파일이라 발생하는 윈도우 보안의 정상적인 필터 작동입니다.<br>
+    <strong>해결 방법</strong>: 팝업 내부의 <strong>[추가 정보]</strong> 글씨를 클릭한 후, 아래에 나타나는 <strong>[실행]</strong> 버튼을 클릭하시면 정상 기동됩니다.
+  </div>
+
+  <h2>4. 최초 로그인 및 인증 연동</h2>
+  <p>자동으로 열린 브라우저 화면의 <strong>API Session</strong> 카드에서 연동을 완료합니다.</p>
+  <ol>
+    <li>발급받은 <strong>App api_id</strong>, <strong>App api_hash</strong>를 각각 칸에 입력합니다.</li>
+    <li><strong>Phone</strong> 입력 칸에 본인의 핸드폰 번호를 국가코드 형식(<code>+8210...</code>)으로 입력합니다.</li>
+    <li><strong>[Connect]</strong> 버튼을 누릅니다.</li>
+    <li><strong>인증 코드 및 비밀번호 입력</strong>
+      <ul>
+        <li>본인의 텔레그램 앱으로 전달된 <strong>5자리 숫자 인증 코드</strong>를 화면에 나타난 <strong>Login code</strong> 칸에 입력합니다.</li>
+        <li>계정에 <strong>2단계 인증(Two-step Verification) 비밀번호</strong>를 설정해 두셨다면, 하단의 <strong>2FA password</strong> 칸에 해당 비밀번호를 추가 입력합니다.</li>
+      </ul>
+    </li>
+    <li><strong>[Verify]</strong> 버튼을 클릭합니다.</li>
+    <li>연동이 성공하면 화면 상단 상태 메시지가 <strong>Authorized</strong>로 변경됩니다.</li>
+  </ol>
+
+  <h2>5. 주요 기능 사용법</h2>
+  <h3>1) 채널 목록 추가 및 수정 (Settings Panel)</h3>
+  <ul>
+    <li><strong>채널 추가</strong>: Settings 패널을 펼친 후 <strong>[Add Channel]</strong>을 클릭해 새로운 입력 행을 만듭니다.
+      <ul>
+        <li><strong>Channel ID</strong>: 텔레그램 채널의 공유 링크에 포함된 ID를 입력합니다. (예: <code>https://t.me/TasnimNews</code> 이면 <code>TasnimNews</code> 입력)</li>
+        <li><strong>Display Label</strong>: 프로그램 내에서 필터링하거나 표시할 이름(예: <code>타스님 뉴스</code>)을 자유롭게 입력합니다.</li>
+      </ul>
+    </li>
+    <li><strong>저장</strong>: 채널 리스트를 수정한 뒤 하단의 <strong>[Save Channels]</strong> 버튼을 눌러 저장합니다.</li>
+  </ul>
+
+  <h3>2) 검색 및 필터링 기능 (Search Control)</h3>
+  <ul>
+    <li><strong>Search terms</strong>: 검색하려는 키워드를 입력합니다.
+      <ul>
+        <li>여러 개의 키워드를 동시에 개별 검색하고 싶다면 <strong>줄바꿈(Enter) 또는 쉼표(,)</strong>로 키워드를 구분하여 입력하면 한 번에 순차 검색해 줍니다.</li>
+      </ul>
+    </li>
+    <li><strong>Limit</strong>: 한 번에 가져올 포스팅의 개수 최대 한도를 지정합니다. (기본값: 30)</li>
+    <li><strong>Date From / Date To</strong>: 특정 기간 내의 포스팅만 필터링하고 싶을 때 시작 날짜와 종료 날짜를 지정합니다.</li>
+    <li><strong>Content Filter</strong>: 텍스트 형태 외에 동영상, 사진 등의 미디어 속성에 따라 결과를 필터링할 수 있습니다.</li>
+  </ul>
+
+  <h3>3) 결과 다운로드 및 내보내기 (Export & Save)</h3>
+  <ul>
+    <li>검색된 포스팅 목록 상단의 <strong>[Save to Folder]</strong> 버튼을 누르면, 설정된 <strong>Download folder</strong> 경로로 포스팅 내용이 물리 파일로 내보내기되어 저장됩니다.</li>
+    <li><strong>Download folder</strong> 경로는 Settings 패널에서 수정 후 <strong>[Save Folder]</strong>를 눌러 변경이 가능합니다.</li>
+  </ul>
+
+  <h3>4) 구글 크롬(Chrome) 실시간 번역 기능 활용법</h3>
+  <p>이 프로그램은 외국어로 수집된 텔레그램 글을 손쉽게 이해할 수 있도록 크롬 브라우저 사용에 최적화되어 있습니다.</p>
+  <ol>
+    <li>포스팅 글 목록이 보이는 크롬 브라우저 화면의 빈 공간(텍스트가 없는 배경 영역)에 <strong>마우스 우클릭</strong>을 합니다.</li>
+    <li>나타나는 팝업 메뉴에서 <strong>[한국어(으)로 번역]</strong> 항목을 클릭합니다.</li>
+    <li>텔레그램 포스팅 내부의 이란어나 기타 외국어 글들이 실시간으로 한국어로 일괄 번역됩니다.</li>
+    <li>추가로 포스팅을 더 불러오거나(<code>Load More</code>) 새로 검색(<code>Search</code>)했을 때 번역이 자동으로 해제되면, 다시 빈 화면을 우클릭하여 <strong>[한국어(으)로 번역]</strong>을 실행해 주세요.</li>
+  </ol>
+
+  <h2>6. 자주 묻는 질문 (FAQ) 및 트러블슈팅</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>현상</th>
+        <th>원인 및 해결 방법</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>인증 코드가 오지 않습니다.</strong></td>
+        <td>
+          <ul>
+            <li>국가코드 형식을 다시 확인해 주세요. 대한민국은 반드시 <code>+8210...</code> 형식이어야 합니다.</li>
+            <li>문자 메시지(SMS)가 아닌 <strong>텔레그램 공식 앱 내부의 대화방</strong>으로 발송됩니다. 텔레그램 앱을 열어 확인해 주세요.</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>"API credentials are not configured" 에러 발생</strong></td>
+        <td>입력하신 <code>api_id</code>와 <code>api_hash</code>에 스페이스바(공백)나 특수문자가 섞여서 오타가 나지 않았는지 확인하고 다시 입력해 주세요.</td>
+      </tr>
+      <tr>
+        <td><strong>백신 프로그램이 파일을 삭제합니다.</strong></td>
+        <td>패키징 툴(PyInstaller)의 특성으로 백신 오탐지가 발생한 것입니다. 파일은 완전히 안전하므로 백신 설정의 <strong>검사 예외(허용 목록)</strong>에 추가한 후 사용해 주세요.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
